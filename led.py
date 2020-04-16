@@ -1,7 +1,7 @@
 import board
 import neopixel
 from time import sleep
-from random import random
+import random 
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -16,14 +16,14 @@ VIOLET = (128, 0, 255)
 PINK = (255, 0, 255)
 BLACK = (0, 0, 0)
 
-RAINBOW = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
+RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
 pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False)
 
 
 class Hexagon:
     
-
+    
     """
     Creates a range from start_val inclusive to end_val not inclusive
     for pixels that would be controlled
@@ -32,12 +32,22 @@ class Hexagon:
         self.start = start_val
         self.end = end_val
 
+        #lets me know what solid hexagon color it is rn
+        self.color = None
+    
+    def get_deviant_color(self, steps):
+        r_dev = int(random.uniform(-1*steps, steps))
+        g_dev = int(random.uniform(-1*steps, steps))
+        b_dev = int(random.uniform(-1*steps, steps))
+      
+        return (max(0, min(255, self.color[0]+r_dev)), max(0, min(255, self.color[1]+g_dev)), max(0, min(255, self.color[2]+b_dev)))
+        
     def set_color(self, color, show=True):
         for x in range(self.start, self.end):
             pixels[x] = color
         if show:
             pixels.show()
-   
+        self.color = color 
     """
     Side value of 0 - 5, sets it all to one color
     """
@@ -133,27 +143,41 @@ class Structure:
         for hexagon in self.hexagons:
             hexagon.set_color(color)
             sleep(wait)
+    
+    def rainbow_light_in_order(self, wait):
+        for i in range(0, HEX_COUNT):
+            self.hexagons[i].set_color(RAINBOW[i])
+            sleep(wait)
 
     def set_color(self, color):
         for hexagon in self.hexagons:
             hexagon.set_color(color, show=False)
 
         pixels.show()
+    
+    
     #def light_up_vert(self, color, wait):
         
 
-    #def flash_around_base(self, base_color, wait):
-        
+    def flash_around_base(self, base_color, wait):
+        self.set_color(base_color)
+        sleep(wait)
 
+        random.shuffle(self.hexagons)
+        for hexagon in self.hexagons: 
+            hexagon.fade(hexagon.color, hexagon.get_deviant_color(100), 20, .125)
+        
 def main():
 
     display = Structure()
 
-    display.light_in_order(RED, 1)
-    
+    display.rainbow_light_in_order(.1)
+
     display.set_color(BLACK)
 
     hexagons = display.hexagons
+   
+    #display.flash_around_base(RED, 3)
 
     #hexagons[0].wave(ORANGE, 5, 0.2)
     #hexagons[0].rainbow_cycle(.01);
