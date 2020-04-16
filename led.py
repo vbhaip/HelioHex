@@ -3,7 +3,7 @@ import neopixel
 from time import sleep
 from random import random
 
-HEX_COUNT = 1 
+HEX_COUNT = 8 
 LED_HEX = 36
 
 RED = (255, 0, 0)
@@ -32,26 +32,28 @@ class Hexagon:
         self.start = start_val
         self.end = end_val
 
-    def set_color(self, color):
+    def set_color(self, color, show=True):
         for x in range(self.start, self.end):
             pixels[x] = color
-
-        pixels.show()
+        if show:
+            pixels.show()
    
     """
     Side value of 0 - 5, sets it all to one color
     """
     
-    def set_side_color(self, side, color):
-        for x in range(self.start+side*LED_HEX/6, self.start+(side+1)*LED_HEX/6):
+    def set_side_color(self, side, color, show=True):
+        for x in range(self.start+side*LED_HEX//6, self.start+(side+1)*LED_HEX//6):
             pixels[x] = color
-        pixels.show()
+        if show:
+            pixels.show()
 
 
-    def clear(self):
+    def clear(self, show=True):
         for x in range(self.start, self.end):
             pixels[x] = BLACK 
-
+        if show:
+            pixels.show()
 
     def wave(self, color, width, delay):
         if width >= LED_HEX:
@@ -65,7 +67,7 @@ class Hexagon:
             pixels.show()
             sleep(delay)
             
-            self.clear()
+            self.clear(show=False)
 
     #From sample neopixel code
     def wheel(self, pos):
@@ -126,23 +128,38 @@ class Structure:
 
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
+    
+    def light_in_order(self, color, wait):
+        for hexagon in self.hexagons:
+            hexagon.set_color(color)
+            sleep(wait)
+
+    def set_color(self, color):
+        for hexagon in self.hexagons:
+            hexagon.set_color(color, show=False)
+
+        pixels.show()
+    #def light_up_vert(self, color, wait):
         
-        
+
     #def flash_around_base(self, base_color, wait):
         
 
 def main():
-    hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)] 
+
+    display = Structure()
+
+    display.light_in_order(RED, 1)
+    
+    display.set_color(BLACK)
+
+    hexagons = display.hexagons
 
     #hexagons[0].wave(ORANGE, 5, 0.2)
-    hexagons[0].rainbow_cycle(.01);
+    #hexagons[0].rainbow_cycle(.01);
     #hexagons[0].set_color(RED)
     #sleep(5)
 
-    hexagons[0].fade(ORANGE, BLUE, 20, .25)
-    hexagons[0].fade(BLUE, VIOLET, 20, .25)
-    hexagons[0].fade(VIOLET, GREEN, 20, .25)
-    hexagons[0].set_color(BLACK)
 
 if __name__ == '__main__':
     main()
