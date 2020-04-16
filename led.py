@@ -3,6 +3,9 @@ import neopixel
 from time import sleep
 import random 
 from threading import Thread
+from flask import Flask
+
+app = Flask(__name__)
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -153,14 +156,45 @@ class Structure:
             sleep(wait)
 
     def set_color(self, color):
+       
+        threads = []
+       
+        #using threads here doesn't seem to change it, there's still a little delay between hexs
         for hexagon in self.hexagons:
-            hexagon.set_color(color, show=False)
+            t = Thread(target=hexagon.set_color, args=(color, False))
+            threads.append(t)
+        
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
 
         pixels.show()
     
-    
-    #def light_up_vert(self, color, wait):
+    def fade(self, c1, c2, steps, delay):
+        r_step = int((c2[0] - c1[0])/steps)
+        g_step = int((c2[1] - c1[1])/steps)
+        b_step = int((c2[2] - c1[2])/steps)
         
+        delay = delay / steps
+
+        new_color = c1
+        
+        self.set_color(c1)
+        sleep(delay)
+
+        for x in range(0, steps):
+            new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
+            self.set_color(new_color)
+            sleep(delay)
+
+ 
+    def cycle_through_rainbow(self):
+        self.set_color(RED);
+
+        for x in range(1, len(RAINBOW)):
+            self.fade(RAINBOW[x-1], RAINBOW[x], 20, 2.5)
 
     def flash_around(self, wait):
         threads = []
@@ -186,18 +220,25 @@ class Structure:
 
 
 
+@app.route("/")
+def index():
+    return "hello"
+
+
 
 def main():
-
+    app.run(host="0.0.0.0", port=5000)
     display = Structure()
 
-    display.rainbow_light_in_order(.1)
+    #display.rainbow_light_in_order(.1)
+    
+    display.cycle_through_rainbow()
 
     display.set_color(BLACK)
 
     hexagons = display.hexagons
    
-    display.flash_around_base(RED, 3)
+    display.flash_around_base(BLUE, 3)
     display.flash_around(3)
     display.flash_around(3)
 
