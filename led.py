@@ -2,6 +2,7 @@ import board
 import neopixel
 from time import sleep
 import random 
+from threading import Thread
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -123,6 +124,8 @@ class Hexagon:
         g_step = int((c2[1] - c1[1])/steps)
         b_step = int((c2[2] - c1[2])/steps)
         
+        delay = delay / steps
+
         new_color = c1
         
         self.set_color(c1)
@@ -159,14 +162,31 @@ class Structure:
     #def light_up_vert(self, color, wait):
         
 
+    def flash_around(self, wait):
+        threads = []
+        
+        hex_copy = self.hexagons
+        random.shuffle(hex_copy)
+        for hexagon in hex_copy: 
+            t = Thread(target=hexagon.fade, args=(hexagon.color, hexagon.get_deviant_color(50), 20, 2.5))
+            t.start()
+            threads.append(t)
+            
+            sleep(random.uniform(wait/2.0, wait))
+
+
+        for t in threads:
+            t.join()
+       
+
     def flash_around_base(self, base_color, wait):
         self.set_color(base_color)
         sleep(wait)
+        self.flash_around(wait)
 
-        random.shuffle(self.hexagons)
-        for hexagon in self.hexagons: 
-            hexagon.fade(hexagon.color, hexagon.get_deviant_color(100), 20, .125)
-        
+
+
+
 def main():
 
     display = Structure()
@@ -177,8 +197,13 @@ def main():
 
     hexagons = display.hexagons
    
-    #display.flash_around_base(RED, 3)
+    display.flash_around_base(RED, 3)
+    display.flash_around(3)
+    display.flash_around(3)
 
+
+    display.set_color(BLACK)
+    
     #hexagons[0].wave(ORANGE, 5, 0.2)
     #hexagons[0].rainbow_cycle(.01);
     #hexagons[0].set_color(RED)
