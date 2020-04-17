@@ -22,7 +22,7 @@ BLACK = (0, 0, 0)
 
 RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
-pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False)
+pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=0.5)
 
 
 class Hexagon:
@@ -157,6 +157,7 @@ class Structure:
         self.connect(self.hexagons[1], self.hexagons[2], 4)
         self.connect(self.hexagons[2], self.hexagons[3], 2) 
         self.connect(self.hexagons[3], self.hexagons[4], 2)
+        self.connect(self.hexagons[3], self.hexagons[5], 3)
         self.connect(self.hexagons[4], self.hexagons[5], 4)
         self.connect(self.hexagons[5], self.hexagons[6], 4)
         self.connect(self.hexagons[6], self.hexagons[7], 5)
@@ -166,6 +167,29 @@ class Structure:
         hex1.connections[hex1_side] = hex2
         hex2.connections[(hex1_side+3)%6] = hex1
 
+   
+
+    def ripple_fade(self, start_hex_ind, color, delay):
+        start_hex = self.hexagons[start_hex_ind] 
+        hexagons_to_do = [start_hex]
+        completed_hexagons = [] 
+        while(len(hexagons_to_do) > 0):
+            temp_hexagons_to_do = [] 
+            while(len(hexagons_to_do) > 0):
+                hexagon = hexagons_to_do.pop(0)
+                t = Thread(target=hexagon.fade, args=(hexagon.color, color, 20, 2.5))
+                t.start()
+                
+                completed_hexagons.append(hexagon)
+                
+                for connected_hexagon in hexagon.connections:
+                    if connected_hexagon is not None and connected_hexagon not in completed_hexagons and connected_hexagon not in temp_hexagons_to_do:
+                        temp_hexagons_to_do.append(connected_hexagon)
+
+            hexagons_to_do.extend(temp_hexagons_to_do) 
+
+            sleep(delay)
+        
 
     def light_in_order(self, color, wait):
         for hexagon in self.hexagons:
@@ -262,6 +286,8 @@ def play_song():
 
 
 def main():
+    display.set_color(YELLOW)
+    display.ripple_fade(5, PINK, 2)
     app.run(host="0.0.0.0", port=5000)
 
     #display.rainbow_light_in_order(.1)
