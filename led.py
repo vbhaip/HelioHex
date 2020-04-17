@@ -4,6 +4,7 @@ from time import sleep
 import random 
 from threading import Thread
 from flask import Flask, request, jsonify
+from multiprocessing import Process
 
 app = Flask(__name__)
 
@@ -20,9 +21,11 @@ VIOLET = (128, 0, 255)
 PINK = (255, 0, 255)
 BLACK = (0, 0, 0)
 
+REFRESH_RATE = 0.001
+
 RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
-pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=0.5)
+pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=.5)
 
 
 class Hexagon:
@@ -44,8 +47,7 @@ class Hexagon:
         #0 corresponds to bottom left side and 5 corresponds to bottom side
         self.connections = [None for i in range(0, 6)]
 
-
-    
+        
     def get_deviant_color(self, steps):
         r_dev = int(random.uniform(-1*steps, steps))
         g_dev = int(random.uniform(-1*steps, steps))
@@ -138,12 +140,12 @@ class Hexagon:
 
         new_color = c1
         
-        self.set_color(c1)
+        self.set_color(c1, show=False)
         sleep(delay)
 
         for x in range(0, steps):
             new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
-            self.set_color(new_color)
+            self.set_color(new_color, show=False)
             sleep(delay)
 
 
@@ -152,7 +154,7 @@ class Structure:
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
         
-
+        self.connect(self.hexagons[1], self.hexagons[0], 0)
         self.connect(self.hexagons[1], self.hexagons[3], 3)
         self.connect(self.hexagons[1], self.hexagons[2], 4)
         self.connect(self.hexagons[2], self.hexagons[3], 2) 
@@ -161,7 +163,16 @@ class Structure:
         self.connect(self.hexagons[4], self.hexagons[5], 4)
         self.connect(self.hexagons[5], self.hexagons[6], 4)
         self.connect(self.hexagons[6], self.hexagons[7], 5)
+        
 
+        self.process = Thread(target=self.update, args=())
+        
+        self.process.start()
+
+    def update(self):
+        while True:
+            pixels.show()
+            sleep(REFRESH_RATE)
 
     def connect(self, hex1, hex2, hex1_side):
         hex1.connections[hex1_side] = hex2
@@ -169,22 +180,29 @@ class Structure:
 
    
 
-    def ripple_fade(self, start_hex_ind, color, delay):
+    def ripple_fade(self, start_hex_ind, color, delay, fade_time):
         start_hex = self.hexagons[start_hex_ind] 
         hexagons_to_do = [start_hex]
         completed_hexagons = [] 
         while(len(hexagons_to_do) > 0):
-            temp_hexagons_to_do = [] 
+            temp_hexagons_to_do = []
+            processes = []
             while(len(hexagons_to_do) > 0):
                 hexagon = hexagons_to_do.pop(0)
-                t = Thread(target=hexagon.fade, args=(hexagon.color, color, 20, 2.5))
-                t.start()
+                t = Thread(target=hexagon.fade, args=(hexagon.color, color, 20, fade_time))
+                processes.append(t) 
                 
                 completed_hexagons.append(hexagon)
                 
                 for connected_hexagon in hexagon.connections:
                     if connected_hexagon is not None and connected_hexagon not in completed_hexagons and connected_hexagon not in temp_hexagons_to_do:
                         temp_hexagons_to_do.append(connected_hexagon)
+            
+            for process in processes:
+                process.start()
+           
+           # for process in processes:
+           #     process.join()
 
             hexagons_to_do.extend(temp_hexagons_to_do) 
 
@@ -286,8 +304,16 @@ def play_song():
 
 
 def main():
-    display.set_color(YELLOW)
-    display.ripple_fade(5, PINK, 2)
+    display.set_color(YELLOW, show =False)
+    while True:
+        for color in RAINBOW:
+            display.set_color(color, show=False)
+            sleep(.5)
+            
+    for color in RAINBOW:
+        display.ripple_fade(int(random.uniform(0, 6)), color, .5, 2)
+    #display.ripple_fade(5, PINK, .4, .1)
+    #display.ripple_fade(3, GREEN, .4, .1)
     app.run(host="0.0.0.0", port=5000)
 
     #display.rainbow_light_in_order(.1)
