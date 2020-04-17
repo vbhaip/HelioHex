@@ -304,10 +304,10 @@ def play_song():
 
 
 def main():
-    display.set_color(YELLOW, show =False)
+    display.set_color(YELLOW)
     while True:
         for color in RAINBOW:
-            display.set_color(color, show=False)
+            display.set_color(color)
             sleep(.5)
             
     for color in RAINBOW:
