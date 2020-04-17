@@ -5,6 +5,8 @@ import random
 from threading import Thread
 from flask import Flask, request, jsonify
 from multiprocessing import Process
+import signal
+import sys
 
 app = Flask(__name__)
 
@@ -168,6 +170,11 @@ class Structure:
         self.process = Thread(target=self.update, args=())
         
         self.process.start()
+    
+    def clear(self):
+        for hexagon in self.hexagons:
+            hexagon.clear(show=False)
+        pixels.show()
 
     def update(self):
         while True:
@@ -211,12 +218,12 @@ class Structure:
 
     def light_in_order(self, color, wait):
         for hexagon in self.hexagons:
-            hexagon.set_color(color)
+            hexagon.set_color(color, show=False)
             sleep(wait)
     
     def rainbow_light_in_order(self, wait):
         for i in range(0, HEX_COUNT):
-            self.hexagons[i].set_color(RAINBOW[i])
+            self.hexagons[i].set_color(RAINBOW[i], show=False)
             sleep(wait)
 
     def set_color(self, color):
@@ -284,8 +291,13 @@ class Structure:
         sleep(wait)
         self.flash_around(wait)
 
-
 display = Structure()
+
+def end_program(sig, frame):
+    display.clear()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, end_program)
 
 @app.route("/")
 def index():
@@ -305,10 +317,12 @@ def play_song():
 
 def main():
     display.set_color(YELLOW)
+    display.rainbow_light_in_order(.5)
     while True:
         for color in RAINBOW:
-            display.set_color(color)
-            sleep(.5)
+            t = Thread(target=display.ripple_fade, args=(5, color, .5, 1))
+            t.start()
+            sleep(2)
             
     for color in RAINBOW:
         display.ripple_fade(int(random.uniform(0, 6)), color, .5, 2)
