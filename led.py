@@ -2,7 +2,7 @@ import board
 import neopixel
 from time import sleep
 import random 
-from threading import Thread
+from threading import Thread, Lock
 from flask import Flask, request, jsonify
 from multiprocessing import Process
 import signal
@@ -29,6 +29,7 @@ RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
 pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=.5)
 
+lock = Lock()
 
 class Hexagon:
     
@@ -58,8 +59,11 @@ class Hexagon:
         return (max(0, min(255, self.color[0]+r_dev)), max(0, min(255, self.color[1]+g_dev)), max(0, min(255, self.color[2]+b_dev)))
         
     def set_color(self, color, show=True):
+        lock.acquire()
         for x in range(self.start, self.end):
             pixels[x] = color
+
+        lock.release()
         if show:
             pixels.show()
         self.color = color 
