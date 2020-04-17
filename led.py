@@ -3,7 +3,7 @@ import neopixel
 from time import sleep
 import random 
 from threading import Thread
-from flask import Flask
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
@@ -38,6 +38,13 @@ class Hexagon:
 
         #lets me know what solid hexagon color it is rn
         self.color = None
+    
+        #used to see which hexagons connect to each other
+        #will have to be adjusted manually depending on structure chosen
+        #0 corresponds to bottom left side and 5 corresponds to bottom side
+        self.connections = [None for i in range(0, 6)]
+
+
     
     def get_deviant_color(self, steps):
         r_dev = int(random.uniform(-1*steps, steps))
@@ -144,7 +151,22 @@ class Structure:
 
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
-    
+        
+
+        self.connect(self.hexagons[1], self.hexagons[3], 3)
+        self.connect(self.hexagons[1], self.hexagons[2], 4)
+        self.connect(self.hexagons[2], self.hexagons[3], 2) 
+        self.connect(self.hexagons[3], self.hexagons[4], 2)
+        self.connect(self.hexagons[4], self.hexagons[5], 4)
+        self.connect(self.hexagons[5], self.hexagons[6], 4)
+        self.connect(self.hexagons[6], self.hexagons[7], 5)
+
+
+    def connect(self, hex1, hex2, hex1_side):
+        hex1.connections[hex1_side] = hex2
+        hex2.connections[(hex1_side+3)%6] = hex1
+
+
     def light_in_order(self, color, wait):
         for hexagon in self.hexagons:
             hexagon.set_color(color)
@@ -156,19 +178,21 @@ class Structure:
             sleep(wait)
 
     def set_color(self, color):
-       
-        threads = []
+        
+
+        #threads = []
        
         #using threads here doesn't seem to change it, there's still a little delay between hexs
         for hexagon in self.hexagons:
-            t = Thread(target=hexagon.set_color, args=(color, False))
-            threads.append(t)
+            hexagon.set_color(color, show=False)
+            #t = Thread(target=hexagon.set_color, args=(color, False))
+        #    threads.append(t)
         
-        for t in threads:
-            t.start()
+        #for t in threads:
+        #    t.start()
 
-        for t in threads:
-            t.join()
+        #for t in threads:
+        #    t.join()
 
         pixels.show()
     
@@ -219,16 +243,26 @@ class Structure:
         self.flash_around(wait)
 
 
+display = Structure()
 
 @app.route("/")
 def index():
     return "hello"
 
+@app.route("/rainbow_cycle")
+def rainbow_cycle():
+    display.cycle_through_rainbow() 
+    return
+
+@app.route("/play_song", methods=["POST"])
+def play_song():
+    display.set_color(PINK)
+    data = jsonify(request.json)
+    return data
 
 
 def main():
     app.run(host="0.0.0.0", port=5000)
-    display = Structure()
 
     #display.rainbow_light_in_order(.1)
     
