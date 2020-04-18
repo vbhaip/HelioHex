@@ -295,13 +295,13 @@ class Structure:
         sleep(wait)
         self.flash_around(wait)
 
-display = Structure()
+#display = Structure()
+display = None
 
 def end_program(sig, frame):
     display.clear()
     sys.exit(0)
 
-signal.signal(signal.SIGINT, end_program)
 
 @app.route("/")
 def index():
@@ -320,6 +320,8 @@ def play_song():
 
 
 def main():
+    signal.signal(signal.SIGINT, end_program)
+    
     display.set_color(YELLOW)
     display.rainbow_light_in_order(.5)
     while True:
