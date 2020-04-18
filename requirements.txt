@@ -1,0 +1,5 @@
+adafruit_circuitpython_neopixel==5.1.1
+spotipy==2.11.1
+Adafruit_Blinka==4.3.0
+Flask==1.0.2
+board==1.0
