@@ -1,4 +1,5 @@
-import led
+import light_controller as lc
+import spotipy
 
 #to do
 
@@ -10,4 +11,5 @@ import led
 
 #parse the rhythm and turn that into some lights
 
-
+class SpotifyVisualizer:
+    

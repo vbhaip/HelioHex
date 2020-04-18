@@ -29,7 +29,6 @@ RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
 pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=.5)
 
-lock = Lock()
 
 class Hexagon:
     
@@ -49,7 +48,8 @@ class Hexagon:
         #will have to be adjusted manually depending on structure chosen
         #0 corresponds to bottom left side and 5 corresponds to bottom side
         self.connections = [None for i in range(0, 6)]
-
+        
+        self.lock = Lock()
         
     def get_deviant_color(self, steps):
         r_dev = int(random.uniform(-1*steps, steps))
@@ -59,11 +59,11 @@ class Hexagon:
         return (max(0, min(255, self.color[0]+r_dev)), max(0, min(255, self.color[1]+g_dev)), max(0, min(255, self.color[2]+b_dev)))
         
     def set_color(self, color, show=True):
-        lock.acquire()
+        self.lock.acquire()
         for x in range(self.start, self.end):
             pixels[x] = color
 
-        lock.release()
+        self.lock.release()
         if show:
             pixels.show()
         self.color = color 
@@ -295,11 +295,10 @@ class Structure:
         sleep(wait)
         self.flash_around(wait)
 
-#display = Structure()
-display = None
-
 def end_program(sig, frame):
-    display.clear()
+    for i in range(0, LED_HEX*HEX_COUNT):
+        pixels[i] = BLACK
+    pixels.show()
     sys.exit(0)
 
 
@@ -320,11 +319,14 @@ def play_song():
 
 
 def main():
+    display = Structure()
     signal.signal(signal.SIGINT, end_program)
     
     display.set_color(YELLOW)
     display.rainbow_light_in_order(.5)
-    while True:
+
+
+    for x in range(0, 5):
         for color in RAINBOW:
             t = Thread(target=display.ripple_fade, args=(5, color, .5, 1))
             t.start()
