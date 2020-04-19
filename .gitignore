@@ -1,2 +1,3 @@
 credentials.py
 __pycache__
+cached_spotify_token.txt
