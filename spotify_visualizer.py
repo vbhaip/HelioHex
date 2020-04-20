@@ -35,7 +35,7 @@ class SpotifyVisualizer:
 
         self.time_vals = None
         self.loudness_vals = None
-
+        self.pitch_vals = None
 
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state"
@@ -56,13 +56,13 @@ class SpotifyVisualizer:
         interp_fxns = []
         for i in range(0, len(x) - (length - 1), length):
            new_x_vals.append(x[i])
-           interp_fxns.append(interpolate.interp1d(x[i:i+length], y[i:i+length], kind='nearest', fill_value='extrapolate', assume_sorted=True))
+           interp_fxns.append(interpolate.interp1d(x[i:i+length], y[i:i+length], kind='cubic', fill_value='extrapolate', assume_sorted=True))
 
         return np.array(new_x_vals), np.array(interp_fxns)
     
     def get_value_from_interp(self, x_val, x, interp_fxns):
         loc = np.searchsorted(x, x_val)
-        f = interp_fxns[loc]
+        f = interp_fxns[loc-1]
 
         return f(x_val)
 
@@ -80,23 +80,43 @@ class SpotifyVisualizer:
             
             time_vals = []
             loudness_vals = []
+            pitch_vals = []
             for segment in segments:
                 time_vals.append(segment['start'])
                 loudness_vals.append(segment['loudness_start'])
-            
+                pitch_vals.append(segment['pitches'])
+
             #normalization for loudness vals from 0 to 1
             loudness_vals = np.array(loudness_vals)
             loudness_vals = (loudness_vals - np.min(loudness_vals))/np.ptp(loudness_vals)
             
             self.time_vals, self.loudness_vals = self.interp(time_vals, loudness_vals)
-    
+            
+            self.pitch_vals = []
+            for i in range(0, 12):
+                print([pitch_vals[a][i] for a in range(0, len(pitch_vals))])
+                temp = interpolate.interp1d(time_vals, [pitch_vals[a][i] for a in range(0, len(pitch_vals))], kind='cubic', fill_value='extrapolate', assume_sorted=True)
+                self.pitch_vals.append(temp)
+            
+            self.pitch_vals = np.array(self.pitch_vals)
+            print(self.pitch_vals)
+
     def sync(self):
+        temp_rainbow = lc.RAINBOW
+        temp_rainbow.extend(lc.RAINBOW[0:4])
         while True:
             self.get_current_track()
             curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
             print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
             self.display.set_brightness(curr_loudness)
-            sleep(1)
+
+            curr_pitch = []
+            for i in range(0, 12):
+                curr_pitch.append(self.pitch_vals[i](self.pos))
+            curr_pitch = np.array(curr_pitch)
+
+            self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
+            sleep(0.1)
             
 
 def main():
