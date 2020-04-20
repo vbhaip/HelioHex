@@ -188,7 +188,9 @@ class Structure:
     def connect(self, hex1, hex2, hex1_side):
         hex1.connections[hex1_side] = hex2
         hex2.connections[(hex1_side+3)%6] = hex1
-
+    
+    def set_brightness(self, b):
+        pixels.brightness = b
    
 
     def ripple_fade(self, start_hex_ind, color, delay, fade_time):
