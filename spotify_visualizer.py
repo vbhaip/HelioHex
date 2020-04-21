@@ -50,7 +50,7 @@ class SpotifyVisualizer:
     def show(self, info):
         print(json.dumps(info, indent=4))
     
-    def interp(self, x, y, length=4):
+    def interp(self, x, y, length=8):
         
         new_x_vals = []
         interp_fxns = []
@@ -83,7 +83,7 @@ class SpotifyVisualizer:
             pitch_vals = []
             for segment in segments:
                 time_vals.append(segment['start'])
-                loudness_vals.append(segment['loudness_max'])
+                loudness_vals.append(segment['loudness_start'])
                 pitch_vals.append(segment['pitches'])
 
             #normalization for loudness vals from 0 to 1
@@ -133,7 +133,7 @@ class SpotifyVisualizer:
             #self.get_current_track()
             #self.pos += (perf_counter() - curr)
             curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
-            print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
+            #print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
             self.display.set_brightness(curr_loudness)
 
             curr_pitch = []
@@ -143,7 +143,7 @@ class SpotifyVisualizer:
             
             self.set_display_pitch(curr_pitch)
             #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
-            sleep(0.05)
+            sleep(0.01)
             self.pos += (perf_counter() - curr) 
 
 def main():
