@@ -10,8 +10,9 @@ from credentials import CREDENTIALS
 import json
 from scipy import interpolate
 import numpy as np
-from time import sleep, perf_counter
+from time import sleep, perf_counter, time
 from threading import Thread
+from datetime import datetime 
 
 #to do
 
@@ -36,12 +37,21 @@ class SpotifyVisualizer:
         self.time_vals = None
         self.loudness_vals = None
         self.pitch_vals = None
+        
+        self.refresh_rate = None
+
+        self.track_info = None
+        
+        self.sp_refresh = None
+        self.should_refresh = False
+
 
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state"
         manager = spotipy.oauth2.SpotifyOAuth(username=CREDENTIALS["SPOTIFY_USERNAME"], scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"], cache_path="cached_spotify_token.txt")
 
         self.sp = spotipy.Spotify(oauth_manager=manager)
+        self.sp_refresh = spotipy.Spotify(oauth_manager=manager)
         results = self.sp.current_user_saved_tracks()
         for item in results['items']:
             track = item['track']
@@ -50,7 +60,7 @@ class SpotifyVisualizer:
     def show(self, info):
         print(json.dumps(info, indent=4))
     
-    def interp(self, x, y, length=8):
+    def interp(self, x, y, length=4):
         
         new_x_vals = []
         interp_fxns = []
@@ -65,11 +75,17 @@ class SpotifyVisualizer:
         f = interp_fxns[loc-1]
 
         return f(x_val)
-
+    
     def get_current_track(self):
-        track_info = self.sp.current_user_playing_track()
-        self.track = track_info['item']['uri']
-        self.pos = track_info['progress_ms']/1000 
+        curr = perf_counter()
+        self.track_info = self.sp.current_user_playing_track()
+        self.track = self.track_info['item']['uri']
+        self.pos = (self.track_info['progress_ms'] + (perf_counter() - curr))/1000 
+
+    def continuous_refresh_spotify_data(self):
+        while self.should_refresh:
+            self.get_current_track()
+            sleep(5)
 
     def get_track_analysis(self):
         if self.track is not None:
@@ -77,29 +93,32 @@ class SpotifyVisualizer:
 
             analysis = self.sp.audio_analysis(self.track)
             segments = analysis['segments']
-            
+                        
+            self.refresh_rate = (60.0/analysis['track']['tempo'])/10.0
+           
+           
             time_vals = []
             loudness_vals = []
             pitch_vals = []
             for segment in segments:
                 time_vals.append(segment['start'])
-                loudness_vals.append(segment['loudness_start'])
+                loudness_vals.append(segment['loudness_max']-segment['loudness_start'])
                 pitch_vals.append(segment['pitches'])
 
             #normalization for loudness vals from 0 to 1
             loudness_vals = np.array(loudness_vals)
             loudness_vals = (loudness_vals - np.min(loudness_vals))/np.ptp(loudness_vals)
-            
+            loudness_vals = loudness_vals*.5+.5
+
+
             self.time_vals, self.loudness_vals = self.interp(time_vals, loudness_vals)
             
             self.pitch_vals = []
             for i in range(0, 12):
-                print([pitch_vals[a][i] for a in range(0, len(pitch_vals))])
                 temp = interpolate.interp1d(time_vals, [pitch_vals[a][i] for a in range(0, len(pitch_vals))], kind='cubic', fill_value='extrapolate', assume_sorted=True)
                 self.pitch_vals.append(temp)
             
             self.pitch_vals = np.array(self.pitch_vals)
-            print([x['duration'] for x in analysis['beats']])
 
     def get_rgb_interp_fxns(self, pitch_vals):
         
@@ -133,7 +152,7 @@ class SpotifyVisualizer:
             #self.get_current_track()
             #self.pos += (perf_counter() - curr)
             curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
-            #print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
+            print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
             self.display.set_brightness(curr_loudness)
 
             curr_pitch = []
@@ -143,8 +162,14 @@ class SpotifyVisualizer:
             
             self.set_display_pitch(curr_pitch)
             #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
-            sleep(0.01)
-            self.pos += (perf_counter() - curr) 
+            sleep(self.refresh_rate - (perf_counter() - curr))
+            self.pos += self.refresh_rate 
+    
+    def visualize(self):
+        self.should_refresh = True
+        t = Thread(target=self.continuous_refresh_spotify_data)
+        t.start()
+        self.sync()
 
 def main():
 
@@ -152,7 +177,7 @@ def main():
     visualizer.authenticate()
     visualizer.get_current_track()
     visualizer.get_track_analysis()
-    visualizer.sync()
+    visualizer.visualize()
 
 
 if __name__ == "__main__":
