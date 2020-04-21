@@ -10,7 +10,7 @@ from credentials import CREDENTIALS
 import json
 from scipy import interpolate
 import numpy as np
-from time import sleep
+from time import sleep, perf_counter
 from threading import Thread
 
 #to do
@@ -83,7 +83,7 @@ class SpotifyVisualizer:
             pitch_vals = []
             for segment in segments:
                 time_vals.append(segment['start'])
-                loudness_vals.append(segment['loudness_start'])
+                loudness_vals.append(segment['loudness_max'])
                 pitch_vals.append(segment['pitches'])
 
             #normalization for loudness vals from 0 to 1
@@ -99,13 +99,39 @@ class SpotifyVisualizer:
                 self.pitch_vals.append(temp)
             
             self.pitch_vals = np.array(self.pitch_vals)
-            print(self.pitch_vals)
+            print([x['duration'] for x in analysis['beats']])
+
+    def get_rgb_interp_fxns(self, pitch_vals):
+        
+        pitch_vals = 255*pitch_vals
+        #note to self: if hex_count is not divisible by 4, might run into issues
+        time_vals = [x for x in range(0, lc.HEX_COUNT, lc.HEX_COUNT//4)]
+        _, r_interp = self.interp(time_vals, pitch_vals[0:4], length=4)
+        _, g_interp = self.interp(time_vals, pitch_vals[4:8], length=4) 
+        _, b_interp = self.interp(time_vals, pitch_vals[8:12], length=4)
+        
+        return(r_interp[0], g_interp[0], b_interp[0])
+   
+    def get_color_from_rgb_interp(self, r, g, b, ind):
+        r_val = 255-max(0, min(255, int(r(ind))))
+        g_val = 255-max(0, min(255, int(g(ind))))
+        b_val = 255-max(0, min(255, int(b(ind))))
+
+        return (r_val, g_val, b_val)
+
+    def set_display_pitch(self, pitch_vals):
+        r, g, b = self.get_rgb_interp_fxns(pitch_vals)
+
+        for i in range(0, lc.HEX_COUNT):
+            self.display.hexagons[i].set_color(self.get_color_from_rgb_interp(r, g, b, i), show=False)
 
     def sync(self):
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
         while True:
-            self.get_current_track()
+            curr = perf_counter()
+            #self.get_current_track()
+            #self.pos += (perf_counter() - curr)
             curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
             print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
             self.display.set_brightness(curr_loudness)
@@ -114,10 +140,11 @@ class SpotifyVisualizer:
             for i in range(0, 12):
                 curr_pitch.append(self.pitch_vals[i](self.pos))
             curr_pitch = np.array(curr_pitch)
-
-            self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
-            sleep(0.1)
             
+            self.set_display_pitch(curr_pitch)
+            #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
+            sleep(0.05)
+            self.pos += (perf_counter() - curr) 
 
 def main():
 
