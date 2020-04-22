@@ -96,22 +96,25 @@ class SpotifyVisualizer:
         #this deals with if we switch songs
         elif self.track != temp_track:
             self.should_sync = False
+            self.should_refresh = False
             self.track = temp_track
             self.get_track_analysis()
             self.should_sync = True
+            self.should_refresh = True
 
         #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
         self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
 
     def continuous_refresh_spotify_data(self):
-        while self.should_refresh:
-            self.get_current_track()
-            sleep(2)
+        while True: 
+            if self.should_refresh:
+                self.get_current_track()
+                sleep(2)
    
     def continuous_update_playback(self):
         while self.should_refresh:
             self.sp_play_pause.pause_playback()
-            sleep(0.1)
+            #sleep(0.1)
             self.sp_play_pause.start_playback()
             sleep(60)
 
@@ -123,7 +126,7 @@ class SpotifyVisualizer:
             analysis = self.sp.audio_analysis(self.track)
             segments = analysis['segments']
                         
-            self.refresh_rate = (60.0/analysis['track']['tempo'])/10.0
+            self.refresh_rate = (60.0/analysis['track']['tempo'])/8.0
            
            
             time_vals = []
@@ -137,7 +140,7 @@ class SpotifyVisualizer:
             #normalization for loudness vals from 0 to 1
             loudness_vals = np.array(loudness_vals)
             loudness_vals = (loudness_vals - np.min(loudness_vals))/np.ptp(loudness_vals)
-            loudness_vals = loudness_vals*.2+.2
+            loudness_vals = loudness_vals*.6+.2
 
 
             self.time_vals, self.loudness_vals = self.interp(time_vals, loudness_vals)
@@ -153,7 +156,9 @@ class SpotifyVisualizer:
         
         pitch_vals = 255*pitch_vals
         #note to self: if hex_count is not divisible by 4, might run into issues
-        time_vals = [x for x in range(0, lc.HEX_COUNT, lc.HEX_COUNT//4)]
+        #time_vals = [x for x in range(0, lc.HEX_COUNT, lc.HEX_COUNT//4)]
+        time_vals = [lc.HEX_COUNT*x/(4.0 - 1) for x in range(0, 4)] 
+
         _, r_interp = self.interp(time_vals, pitch_vals[0:4], length=4)
         _, g_interp = self.interp(time_vals, pitch_vals[4:8], length=4) 
         _, b_interp = self.interp(time_vals, pitch_vals[8:12], length=4)
@@ -177,25 +182,28 @@ class SpotifyVisualizer:
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
         self.should_sync = True
-        while self.should_sync:
-            curr = perf_counter()
-            #self.get_current_track()
-            #self.pos += (perf_counter() - curr)
-            curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
-            print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
-            if(curr_loudness < 0):
-                curr_loudness = 0.1
-            self.display.set_brightness(curr_loudness)
+        while True:
+            if self.should_sync:
+                curr = perf_counter()
+                #self.get_current_track()
+                #self.pos += (perf_counter() - curr)
+                curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
+                print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
+                if(curr_loudness < 0.2):
+                    curr_loudness = 0.2
+                elif(curr_loudness > .8):
+                    curr_loudness = .8
+                self.display.set_brightness(curr_loudness)
 
-            curr_pitch = []
-            for i in range(0, 12):
-                curr_pitch.append(self.pitch_vals[i](self.pos))
-            curr_pitch = np.array(curr_pitch)
-            
-            self.set_display_pitch(curr_pitch)
-            #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
-            sleep(self.refresh_rate - (perf_counter() - curr))
-            self.update_pos(self.pos + self.refresh_rate)
+                curr_pitch = []
+                for i in range(0, 12):
+                    curr_pitch.append(self.pitch_vals[i](self.pos))
+                curr_pitch = np.array(curr_pitch)
+                
+                self.set_display_pitch(curr_pitch)
+                #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
+                sleep(self.refresh_rate - (perf_counter() - curr))
+                self.update_pos(self.pos + self.refresh_rate)
     
     def visualize(self):
         self.should_refresh = True
