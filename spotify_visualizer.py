@@ -24,6 +24,8 @@ from datetime import datetime
 
 #parse the rhythm and turn that into some lights
 
+VERBOSE = False 
+
 class SpotifyVisualizer:
     
     def __init__(self):
@@ -110,7 +112,7 @@ class SpotifyVisualizer:
                 self.should_refresh = True
 
             #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
-            self.update_pos((self.track_info['progress_ms'])/1000 - .5 + perf_counter() - curr)
+            self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
         else:
             print("Please play a song to start.\n\n")
 
@@ -131,13 +133,23 @@ class SpotifyVisualizer:
 
     def get_track_analysis(self):
         if self.track is not None:
-            self.show(self.sp.audio_analysis(self.track)['segments'][0])
+            #self.show(self.sp.audio_analysis(self.track)['segments'][0:2])
+           
+            features = self.sp.audio_features(self.track)[0]
             
+            self.acoustic = features['acousticness']
+            self.energy = features['energy']
+            self.valence = features['valence']
+            print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
 
             analysis = self.sp.audio_analysis(self.track)
             segments = analysis['segments']
             
-            self.key = analysis['sections'][0]['key']
+            try:
+                self.key = analysis['sections'][0]['key']
+            except:
+                self.key = 7
+
             self.refresh_rate = (60.0/analysis['track']['tempo'])/8.0
             #self.refresh_rate = 0.05 
            
@@ -145,7 +157,10 @@ class SpotifyVisualizer:
             loudness_vals = []
             pitch_vals = []
             for segment in segments:
-                time_vals.append(segment['start'])
+                if 'start' not in segment:
+                    time_vals.append(0.0)
+                else:
+                    time_vals.append(segment['start'])
                 loudness_vals.append(0*segment['loudness_max']+1*segment['loudness_start'])
                 pitch_vals.append(segment['pitches'])
 
@@ -178,9 +193,9 @@ class SpotifyVisualizer:
         return(r_interp[0], g_interp[0], b_interp[0])
    
     def get_color_from_rgb_interp(self, r, g, b, ind):
-        r_val = 255-max(0, min(255, 100 + int(r(ind))))
-        g_val = 255-max(0, min(255, 100 + int(g(ind))))
-        b_val = 255-max(0, min(255, 100 + int(b(ind))))
+        r_val = 255-max(0, min(255, 100 + int(r(ind) - 200*self.energy)))
+        g_val = 255-max(0, min(255, 100 + int(g(ind) - 100*self.acoustic)))
+        b_val = 255-max(0, min(255, 100 + int(b(ind) - 200*(1-self.valence))))
 
         return (r_val, g_val, b_val)
 
@@ -189,11 +204,23 @@ class SpotifyVisualizer:
         
 
         ind = self.key 
+        threads = []
         for i in range(0, lc.HEX_COUNT):
             if uniform is False:
                 ind = i
             self.display.hexagons[i].set_color(self.get_color_from_rgb_interp(r, g, b, ind), show=False)
-            #self.display.hexagons[i].fade(self.display.hexagons[i].color, self.get_color_from_rgb_interp(r,g,b,i), 20, self.refresh_rate)
+            #t = Thread(target=self.display.hexagons[i].fade, args=(self.display.hexagons[i].color, self.get_color_from_rgb_interp(r,g,b,ind), 5, self.refresh_rate/2))
+            #threads.append(t)
+
+
+        #for t in threads:
+        #    t.start()
+        #
+        #for t in threads:
+        #    t.join()
+
+        if uniform is True:
+            sleep(self.refresh_rate*2)
 
     def sync(self):
         temp_rainbow = lc.RAINBOW
@@ -204,7 +231,8 @@ class SpotifyVisualizer:
                 #self.get_current_track()
                 #self.pos += (perf_counter() - curr)
                 curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
-                print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
+                if VERBOSE:
+                    print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
                 if(curr_loudness < 0.2):
                     curr_loudness = 0.2
                 elif(curr_loudness > .8):
@@ -219,14 +247,14 @@ class SpotifyVisualizer:
                 #t = Thread(target=self.set_display_pitch, args=([curr_pitch]))
                 #t.start()
 
-                if(curr_loudness > 0.75):
+                if(curr_loudness > 0.79):
                     self.set_display_pitch(curr_pitch, uniform=True)
                 else:
                     self.set_display_pitch(curr_pitch)
 
                 #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
                 sleep(self.refresh_rate)
-                self.update_pos(self.pos + self.refresh_rate + 0*(perf_counter() - curr))
+                self.update_pos(self.pos + 0*self.refresh_rate + 1*(perf_counter() - curr))
     
     def visualize(self):
 
