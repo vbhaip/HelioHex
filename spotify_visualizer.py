@@ -45,8 +45,9 @@ class SpotifyVisualizer:
 
         self.track_info = None
         
-        self.sp_refresh = None
-        self.should_refresh = False
+        self.sp_refresh = False 
+        self.should_refresh = True
+        self.should_update_playback = False
         
         self.sp_play_pause = None
 
@@ -96,7 +97,7 @@ class SpotifyVisualizer:
         self.track_info = self.sp.current_user_playing_track()
         if(self.track_info != None):
             self.should_sync = True
-            self.should_refresh = True
+            self.should_update_playback = True
 
             temp_track = self.track_info['item']['uri']
             if self.track is None: 
@@ -106,10 +107,12 @@ class SpotifyVisualizer:
             elif self.track != temp_track:
                 self.should_sync = False
                 self.should_refresh = False
+                self.should_update_playback = False
                 self.track = temp_track
                 self.get_track_analysis()
                 self.should_sync = True
                 self.should_refresh = True
+                self.should_update_playback = True
 
             #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
             self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
@@ -124,11 +127,11 @@ class SpotifyVisualizer:
    
     def continuous_update_playback(self):
         while True:
-            if self.should_refresh:
+            if self.should_update_playback and self.track_info['is_playing']:
                 self.sp_play_pause.pause_playback()
                 #sleep(0.1)
                 self.sp_play_pause.start_playback()
-                sleep(60)
+                sleep(240)
 
 
     def get_track_analysis(self):
@@ -161,6 +164,13 @@ class SpotifyVisualizer:
                     time_vals.append(0.0)
                 else:
                     time_vals.append(segment['start'])
+
+                if 'loudness_start' not in segment:
+                    segment['loudness_start'] = -30.0
+                if 'loudness_max' not in segment:
+                    segment['loudness_max'] = segment['loudness_start']
+
+
                 loudness_vals.append(0*segment['loudness_max']+1*segment['loudness_start'])
                 pitch_vals.append(segment['pitches'])
 
@@ -193,9 +203,9 @@ class SpotifyVisualizer:
         return(r_interp[0], g_interp[0], b_interp[0])
    
     def get_color_from_rgb_interp(self, r, g, b, ind):
-        r_val = 255-max(0, min(255, 100 + int(r(ind) - 200*self.energy)))
-        g_val = 255-max(0, min(255, 100 + int(g(ind) - 100*self.acoustic)))
-        b_val = 255-max(0, min(255, 100 + int(b(ind) - 200*(1-self.valence))))
+        r_val = 255-max(0, min(255, 100 + int(r(ind) - 200*(self.energy - 0.5 + self.valence))))
+        g_val = 255-max(0, min(255, 100 + int(g(ind) - 200*self.acoustic)))
+        b_val = 255-max(0, min(255, 100 + int(b(ind) - 500*max(0, 0.5-self.valence))))
 
         return (r_val, g_val, b_val)
 
@@ -226,7 +236,8 @@ class SpotifyVisualizer:
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
         while True:
-            if self.should_sync:
+            if self.should_sync and self.track_info['is_playing']:
+                    
                 curr = perf_counter()
                 #self.get_current_track()
                 #self.pos += (perf_counter() - curr)
@@ -237,6 +248,11 @@ class SpotifyVisualizer:
                     curr_loudness = 0.2
                 elif(curr_loudness > .8):
                     curr_loudness = .8
+
+
+                if self.pos > self.track_info['item']['duration_ms']/1000.0 - 1.0:
+                    curr_loudness = (self.track_info['item']['duration_ms']/1000.0 - self.pos)  
+
                 self.display.set_brightness(curr_loudness)
 
                 curr_pitch = []
@@ -258,6 +274,10 @@ class SpotifyVisualizer:
     
     def visualize(self):
 
+        self.authenticate()
+        self.get_current_track()
+        self.get_track_analysis()
+ 
         threads = []
         threads.append(Thread(target=self.continuous_refresh_spotify_data))
         threads.append(Thread(target=self.continuous_update_playback))
@@ -269,9 +289,6 @@ class SpotifyVisualizer:
 def main():
 
     visualizer = SpotifyVisualizer()
-    visualizer.authenticate()
-    visualizer.get_current_track()
-    visualizer.get_track_analysis()
     visualizer.visualize()
 
 
