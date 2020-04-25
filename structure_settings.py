@@ -1,0 +1,21 @@
+#maps hexagon index to offset value 
+OFFSETS = {0:0,
+           1:5,
+           2:0,
+           3:4,
+           4:3,
+           5:0,
+           6:0,
+           7:2}
+
+#(a,b,c) means hexagon a connects to hexagon b at side number c of hexagon a
+CONNECTIONS = [(1,0,0),
+               (1,2,3),
+               (1,3,2),
+               (2,3,1),
+               (2,4,2),
+               (3,4,3),
+               (4,5,2),
+               (4,6,3),
+               (5,6,4),
+               (6,7,4)]

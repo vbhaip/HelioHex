@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 from multiprocessing import Process
 import signal
 import sys
+import structure_settings as settings
 
 app = Flask(__name__)
 
@@ -166,26 +167,29 @@ class Structure:
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
         
+        
+        for key in settings.OFFSETS:
+            self.hexagons[key].offset = settings.OFFSETS[key]
+        #self.hexagons[1].offset = 5
+        #self.hexagons[2].offset = 0
+        #self.hexagons[3].offset = 4
+        #self.hexagons[4].offset = 3
+        #self.hexagons[5].offset = 0
+        #self.hexagons[6].offset = 0
+        #self.hexagons[7].offset = 2
 
-        self.hexagons[1].offset = 5
-        self.hexagons[2].offset = 0
-        self.hexagons[3].offset = 4
-        self.hexagons[4].offset = 3
-        self.hexagons[5].offset = 0
-        self.hexagons[6].offset = 0
-        self.hexagons[7].offset = 2
 
-
-
-        self.connect(self.hexagons[1], self.hexagons[0], 0)
-        self.connect(self.hexagons[1], self.hexagons[3], 3)
-        self.connect(self.hexagons[1], self.hexagons[2], 4)
-        self.connect(self.hexagons[2], self.hexagons[3], 2) 
-        self.connect(self.hexagons[3], self.hexagons[4], 2)
-        self.connect(self.hexagons[3], self.hexagons[5], 3)
-        self.connect(self.hexagons[4], self.hexagons[5], 4)
-        self.connect(self.hexagons[5], self.hexagons[6], 4)
-        self.connect(self.hexagons[6], self.hexagons[7], 5)
+        for item in settings.CONNECTIONS:
+            self.connect(self.hexagons[item[0]], self.hexagons[item[1]], item[2])
+        #self.connect(self.hexagons[1], self.hexagons[0], 0)
+        #self.connect(self.hexagons[1], self.hexagons[3], 3)
+        #self.connect(self.hexagons[1], self.hexagons[2], 4)
+        #self.connect(self.hexagons[2], self.hexagons[3], 2) 
+        #self.connect(self.hexagons[3], self.hexagons[4], 2)
+        #self.connect(self.hexagons[3], self.hexagons[5], 3)
+        #self.connect(self.hexagons[4], self.hexagons[5], 4)
+        #self.connect(self.hexagons[5], self.hexagons[6], 4)
+        #self.connect(self.hexagons[6], self.hexagons[7], 5)
         
 
         self.process = Thread(target=self.update, args=())
