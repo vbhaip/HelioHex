@@ -94,7 +94,8 @@ class SpotifyVisualizer:
     
     def get_current_track(self):
         curr = perf_counter()
-        self.track_info = self.sp.current_user_playing_track()
+        #self.track_info = self.sp.current_user_playing_track()
+        self.track_info = self.sp.current_playback()
         if(self.track_info != None):
             self.should_sync = True
             self.should_update_playback = True
@@ -132,7 +133,6 @@ class SpotifyVisualizer:
                 #sleep(0.1)
                 self.sp_play_pause.start_playback()
                 sleep(240)
-
 
     def get_track_analysis(self):
         if self.track is not None:
