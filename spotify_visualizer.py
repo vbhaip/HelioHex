@@ -63,9 +63,9 @@ class SpotifyVisualizer:
         self.sp_refresh = spotipy.Spotify(oauth_manager=manager)
         self.sp_play_pause = spotipy.Spotify(oauth_manager=manager)
         results = self.sp.current_user_saved_tracks()
-        for item in results['items']:
-            track = item['track']
-            print(track['name'] + ' - ' + track['artists'][0]['name'])
+        #for item in results['items']:
+        #    track = item['track']
+        #    print(track['name'] + ' - ' + track['artists'][0]['name'])
 
     def show(self, info):
         print(json.dumps(info, indent=4))
@@ -143,7 +143,7 @@ class SpotifyVisualizer:
             self.acoustic = features['acousticness']
             self.energy = features['energy']
             self.valence = features['valence']
-            print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
+            #print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
 
             analysis = self.sp.audio_analysis(self.track)
             segments = analysis['segments']

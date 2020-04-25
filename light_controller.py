@@ -37,7 +37,7 @@ class Hexagon:
     Creates a range from start_val inclusive to end_val not inclusive
     for pixels that would be controlled
     """
-    def __init__(self, start_val, end_val):
+    def __init__(self, start_val, end_val, offset = 0):
         self.start = start_val
         self.end = end_val
 
@@ -48,7 +48,10 @@ class Hexagon:
         #will have to be adjusted manually depending on structure chosen
         #0 corresponds to bottom left side and 5 corresponds to bottom side
         self.connections = [None for i in range(0, 6)]
+       
         
+        self.offset = offset
+
         self.lock = Lock()
         
     def get_deviant_color(self, steps):
@@ -57,7 +60,10 @@ class Hexagon:
         b_dev = int(random.uniform(-1*steps, steps))
       
         return (max(0, min(255, self.color[0]+r_dev)), max(0, min(255, self.color[1]+g_dev)), max(0, min(255, self.color[2]+b_dev)))
-        
+    
+    def adjust_pixel_index(self, val):
+        return (((val-self.start)-6*self.offset)%36)+self.start
+
     def set_color(self, color, show=True):
         self.lock.acquire()
         for x in range(self.start, self.end):
@@ -73,7 +79,7 @@ class Hexagon:
     
     def set_side_color(self, side, color, show=True):
         for x in range(self.start+side*LED_HEX//6, self.start+(side+1)*LED_HEX//6):
-            pixels[x] = color
+            pixels[self.adjust_pixel_index(x)] = color
         if show:
             pixels.show()
 
@@ -90,8 +96,8 @@ class Hexagon:
 
         for x in range(self.start + width, self.end-width):
             for y in range(x-width, x+width+1):
-                pixels[y] = tuple(h//10 for h in color)
-            pixels[x] = color
+                pixels[self.adjust_pixel_index(y)] = tuple(h//10 for h in color)
+            pixels[self.adjust_pixel_index(x)] = color
 
             pixels.show()
             sleep(delay)
@@ -127,8 +133,8 @@ class Hexagon:
                 pixel_index = ((i-self.start) * 256 // LED_HEX) + j
 
                 #bitwise AND, basically mod 256
-                pixels[i] = self.wheel(pixel_index & 255)
-            pixels.show()
+                pixels[self.adjust_pixel_index(i)] = self.wheel(pixel_index & 255)
+            #pixels.show()
             sleep(wait)
 
     def color_wipe(self, color, wait):
@@ -160,6 +166,17 @@ class Structure:
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
         
+
+        self.hexagons[1].offset = 5
+        self.hexagons[2].offset = 0
+        self.hexagons[3].offset = 4
+        self.hexagons[4].offset = 3
+        self.hexagons[5].offset = 0
+        self.hexagons[6].offset = 0
+        self.hexagons[7].offset = 2
+
+
+
         self.connect(self.hexagons[1], self.hexagons[0], 0)
         self.connect(self.hexagons[1], self.hexagons[3], 3)
         self.connect(self.hexagons[1], self.hexagons[2], 4)
@@ -296,6 +313,19 @@ class Structure:
         self.set_color(base_color)
         sleep(wait)
         self.flash_around(wait)
+
+    def rainbow_cycle(self, wait):
+        threads = []
+
+        for hexagon in self.hexagons:
+            threads.append(Thread(target=hexagon.rainbow_cycle, args=[wait]))
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
+
 
 def end_program(sig, frame):
     for i in range(0, LED_HEX*HEX_COUNT):
