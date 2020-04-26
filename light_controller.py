@@ -3,13 +3,11 @@ import neopixel
 from time import sleep
 import random 
 from threading import Thread, Lock
-from flask import Flask, request, jsonify
 from multiprocessing import Process
 import signal
 import sys
 import structure_settings as settings
 
-app = Flask(__name__)
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -195,6 +193,23 @@ class Structure:
         self.process = Thread(target=self.update, args=())
         
         self.process.start()
+        
+        self.continue_process = False
+
+    def _continue_process(foo):
+        def check(self, *args, **kwargs):
+            if 'repeat' in kwargs and kwargs['repeat']:
+                self.continue_process = True
+            else:
+                self.continue_process = False
+            
+            foo(self, *args, **kwargs)
+
+            while self.continue_process:
+                foo(self, *args, **kwargs)
+
+        return check
+
     
     def clear(self):
         for hexagon in self.hexagons:
@@ -289,14 +304,15 @@ class Structure:
             self.set_color(new_color)
             sleep(delay)
 
- 
-    def cycle_through_rainbow(self):
-        self.set_color(RED);
+    @_continue_process 
+    def cycle_through_rainbow(self, repeat=False):
+        self.fade(self.color, RED, 20, 2.5);
 
         for x in range(1, len(RAINBOW)):
             self.fade(RAINBOW[x-1], RAINBOW[x], 20, 2.5)
 
-    def flash_around(self, wait):
+    @_continue_process
+    def flash_around(self, wait, repeat=False):
         threads = []
         
         hex_copy = self.hexagons
@@ -312,13 +328,14 @@ class Structure:
         for t in threads:
             t.join()
        
-
-    def flash_around_base(self, base_color, wait):
+    @_continue_process
+    def flash_around_base(self, base_color, wait, repeat=True):
         self.set_color(base_color)
         sleep(wait)
         self.flash_around(wait)
-
-    def rainbow_cycle(self, wait):
+    
+    @_continue_process
+    def rainbow_cycle(self, wait, repeat=False):
         threads = []
 
         for hexagon in self.hexagons:
@@ -336,23 +353,6 @@ def end_program(sig, frame):
         pixels[i] = BLACK
     pixels.show()
     sys.exit(0)
-
-
-@app.route("/")
-def index():
-    return "hello"
-
-@app.route("/rainbow_cycle")
-def rainbow_cycle():
-    display.cycle_through_rainbow() 
-    return
-
-@app.route("/play_song", methods=["POST"])
-def play_song():
-    display.set_color(PINK)
-    data = jsonify(request.json)
-    return data
-
 
 def main():
     display = Structure()
@@ -372,7 +372,7 @@ def main():
         display.ripple_fade(int(random.uniform(0, 6)), color, .5, 2)
     #display.ripple_fade(5, PINK, .4, .1)
     #display.ripple_fade(3, GREEN, .4, .1)
-    app.run(host="0.0.0.0", port=5000)
+    #app.run(host="0.0.0.0", port=5000)
 
     #display.rainbow_light_in_order(.1)
     
