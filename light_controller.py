@@ -88,6 +88,7 @@ class Hexagon:
             pixels[x] = BLACK 
         if show:
             pixels.show()
+        self.color = BLACK
 
     def wave(self, color, width, delay):
         if width >= LED_HEX:
@@ -228,7 +229,7 @@ class Structure:
     
     def set_brightness(self, b):
         pixels.brightness = b
-   
+     
 
     def ripple_fade(self, start_hex_ind, color, delay, fade_time):
         start_hex = self.hexagons[start_hex_ind] 
@@ -288,29 +289,35 @@ class Structure:
 
         pixels.show()
     
+
+    #note: added self.continue process check here, so it will only run this in continuous circumstances
     def fade(self, c1, c2, steps, delay):
-        r_step = int((c2[0] - c1[0])/steps)
-        g_step = int((c2[1] - c1[1])/steps)
-        b_step = int((c2[2] - c1[2])/steps)
-        
-        delay = delay / steps
 
-        new_color = c1
-        
-        self.set_color(c1)
-        sleep(delay)
+        if(self.continue_process):
+            r_step = int((c2[0] - c1[0])/steps)
+            g_step = int((c2[1] - c1[1])/steps)
+            b_step = int((c2[2] - c1[2])/steps)
+            
+            delay = delay / steps
 
-        for x in range(0, steps):
-            new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
-            self.set_color(new_color)
+            new_color = c1
+            
+            self.set_color(c1)
             sleep(delay)
+
+            for x in range(0, steps):
+                if(self.continue_process):
+                    new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
+                    self.set_color(new_color)
+                    sleep(delay)
 
     @_continue_process 
     def cycle_through_rainbow(self, repeat=False):
         self.fade(RAINBOW[len(RAINBOW) - 1], RAINBOW[0], 20, 2.5);
 
         for x in range(1, len(RAINBOW)):
-            self.fade(RAINBOW[x-1], RAINBOW[x], 20, 2.5)
+            if(self.continue_process):
+                self.fade(RAINBOW[x-1], RAINBOW[x], 20, 2.5)
 
     @_continue_process
     def flash_around(self, wait, repeat=False):

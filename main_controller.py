@@ -21,6 +21,7 @@ def end_current_thread(foo):
             display.continue_process = False
             visualizer.stop() 
             current_thread[0].join()
+            current_thread[0] = None
         return foo(*args, **kwargs)
     return wrapper 
 
@@ -30,6 +31,7 @@ def run_thread(thread):
 
 @app.route("/")
 def index():
+    print("wassup")
     return "hello"
 
 @app.route("/clear")
@@ -38,11 +40,18 @@ def clear():
     display.clear()
     return "Display cleared"
 
+@app.route("/cycle_through_rainbow")
+@end_current_thread
+def cycle_through_rainbow():
+    #display.cycle_through_rainbow() 
+    run_thread(Thread(target=display.cycle_through_rainbow, kwargs=REPEAT_KWARG))
+    return "Mode set to Cycle through Rainbow"
+
 @app.route("/rainbow_cycle")
 @end_current_thread
 def rainbow_cycle():
     #display.cycle_through_rainbow() 
-    run_thread(Thread(target=display.cycle_through_rainbow, kwargs=REPEAT_KWARG))
+    run_thread(Thread(target=display.rainbow_cycle, args=[0.01],  kwargs=REPEAT_KWARG))
     return "Mode set to Rainbow Cycle"
 
 @app.route("/play_song")
@@ -54,9 +63,29 @@ def play_song():
     run_thread(Thread(target=visualizer.visualize))
     return "Visualizing song" 
 
+@app.route("/set_color/<string:rgb>")
+@end_current_thread
+def set_color(rgb):
+    color = tuple(int(x) for x in rgb.split("."))
+    display.set_color(color)
+
+    return "Color set to %s" % str(color)
+
+@app.route("/flash_around")
+@end_current_thread
+def flash_around():
+
+    run_thread(Thread(target=display.flash_around, args=[3], kwargs=REPEAT_KWARG))
+    return "Flashing around"
+
+@app.route("/set_brightness/<float:b>")
+def set_brightness(b):
+    display.set_brightness(b)
+    return "Brightness set to %f" %b
 
 def main():
     print(app.url_map)
+    #print(app.request.host_url)
     app.secret_key = CREDENTIALS['FLASK_SECRET_KEY']
     app.run(host="0.0.0.0", port=5000)
 
