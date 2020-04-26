@@ -48,12 +48,15 @@ class SpotifyVisualizer:
         self.sp_refresh = False 
         self.should_refresh = True
         self.should_update_playback = False
-        
+        self.should_run_visualizer = True
+
         self.sp_play_pause = None
 
         self.pos_lock = Lock()
         
         self.key = None
+
+        self.threads = []
 
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state user-modify-playback-state"
@@ -70,6 +73,15 @@ class SpotifyVisualizer:
     def show(self, info):
         print(json.dumps(info, indent=4))
     
+    def stop(self):
+        self.should_run_visualizer = False
+        #self.sp_refresh = False
+        #self.should_refresh = False
+        #self.should_update_playback = False
+
+        for t in self.threads:
+            t.join()
+
     def update_pos(self, new_val):
         self.pos_lock.acquire()
         self.pos = new_val
@@ -121,18 +133,21 @@ class SpotifyVisualizer:
             print("Please play a song to start.\n\n")
 
     def continuous_refresh_spotify_data(self):
-        while True: 
+        while self.should_run_visualizer: 
             if self.should_refresh:
                 self.get_current_track()
                 sleep(2)
    
     def continuous_update_playback(self):
-        while True:
+        while self.should_run_visualizer:
             if self.should_update_playback and self.track_info['is_playing']:
                 self.sp_play_pause.pause_playback()
                 #sleep(0.1)
                 self.sp_play_pause.start_playback()
-                sleep(240)
+
+                for x in range(120):
+                    if self.should_run_visualizer:
+                       sleep(2)
 
     def get_track_analysis(self):
         if self.track is not None:
@@ -235,7 +250,7 @@ class SpotifyVisualizer:
     def sync(self):
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
-        while True:
+        while self.should_run_visualizer:
             if self.should_sync and self.track_info['is_playing']:
                     
                 curr = perf_counter()
@@ -278,12 +293,12 @@ class SpotifyVisualizer:
         self.get_current_track()
         self.get_track_analysis()
  
-        threads = []
-        threads.append(Thread(target=self.continuous_refresh_spotify_data))
-        threads.append(Thread(target=self.continuous_update_playback))
-        threads.append(Thread(target=self.sync))
+        self.threads = []
+        self.threads.append(Thread(target=self.continuous_refresh_spotify_data))
+        self.threads.append(Thread(target=self.continuous_update_playback))
+        self.threads.append(Thread(target=self.sync))
         
-        for t in threads:
+        for t in self.threads:
             t.start()
 
 def main():

@@ -196,6 +196,7 @@ class Structure:
         
         self.continue_process = False
 
+
     def _continue_process(foo):
         def check(self, *args, **kwargs):
             if 'repeat' in kwargs and kwargs['repeat']:
@@ -306,7 +307,7 @@ class Structure:
 
     @_continue_process 
     def cycle_through_rainbow(self, repeat=False):
-        self.fade(self.color, RED, 20, 2.5);
+        self.fade(RAINBOW[len(RAINBOW) - 1], RAINBOW[0], 20, 2.5);
 
         for x in range(1, len(RAINBOW)):
             self.fade(RAINBOW[x-1], RAINBOW[x], 20, 2.5)
