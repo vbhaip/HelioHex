@@ -47,12 +47,14 @@ def cycle_through_rainbow():
     run_thread(Thread(target=display.cycle_through_rainbow, kwargs=REPEAT_KWARG))
     return "Mode set to Cycle through Rainbow"
 
-@app.route("/rainbow_cycle")
+@app.route("/rainbow_wheel")
 @end_current_thread
-def rainbow_cycle():
+def rainbow_wheel():
     #display.cycle_through_rainbow() 
     run_thread(Thread(target=display.rainbow_cycle, args=[0.01],  kwargs=REPEAT_KWARG))
-    return "Mode set to Rainbow Cycle"
+    response = jsonify({"data": "Mode set to Rainbow Cycle"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
 
 @app.route("/play_song")
 @end_current_thread
@@ -61,28 +63,36 @@ def play_song():
     #data = jsonify(request.json)
     visualizer.should_run_visualizer = True
     run_thread(Thread(target=visualizer.visualize))
-    return "Visualizing song" 
+    response = jsonify({"data": "Visualizing song"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route("/set_color/<string:rgb>")
 @end_current_thread
 def set_color(rgb):
     color = tuple(int(x) for x in rgb.split("."))
     display.set_color(color)
-
-    return "Color set to %s" % str(color)
+    response = jsonify({"data": "Color set to %s" % str(color)})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
 
 @app.route("/flash_around")
 @end_current_thread
 def flash_around():
 
     run_thread(Thread(target=display.flash_around, args=[3], kwargs=REPEAT_KWARG))
-    return "Flashing around"
+
+    response = jsonify({"data": "Flashing around"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
 
 @app.route("/set_brightness/<float:b>")
 @app.route("/set_brightness/<int:b>")
 def set_brightness(b):
     display.set_brightness(b)
-    return "Brightness set to %f" %b
+    response = jsonify({"data": "Brightness set to %f" %b})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
 
 def main():
     print(app.url_map)
