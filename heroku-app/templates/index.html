@@ -5,14 +5,17 @@
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
+		<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.es5.min.js"></script>
+
 	</head>
 
 	<body>
 			<div class="buttons">
-				<button type="button" class="button" value="set_color/255.255.0">Set Color</button>
-				<button type="button" class="button" value="flash_around">Flash Around</button>
-				<button type="button" class="button" value="rainbow_wheel">Rainbow Wheel</button>
-				<button type="button" class="button" value="play_song">Spotify Sync</button>
+				<button type="button" class="button" value="set_color/255.255.0" id="set_color">Set Color</button>
+				<button type="button" class="button basic_button" value="flash_around">Flash Around</button>
+				<button type="button" class="button basic_button" value="rainbow_wheel">Rainbow Wheel</button>
+				<button type="button" class="button basic_button" value="play_song">Spotify Sync</button>
 				<input type="range" min="0" max="100" value="50" class="slider" id="slider">
 			</div>
 	</body>

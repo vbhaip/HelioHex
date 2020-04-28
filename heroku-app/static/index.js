@@ -2,7 +2,7 @@
 // Only run what comes next *after* the page has loaded
 addEventListener("DOMContentLoaded", function() {
 
-  var buttons = document.querySelectorAll(".button");
+  var buttons = document.querySelectorAll(".basic_button");
   for (var i=0, l=buttons.length; i<l; i++) {
     var button = buttons[i];
     // For each button, listen for the "click" event
@@ -52,3 +52,82 @@ slider.onchange = function(){
       request.send();
 }
 
+
+const pickr = Pickr.create({
+    el: '#set_color',
+    theme: 'nano', // or 'monolith', or 'nano'
+
+    swatches: [
+        'rgba(244, 67, 54, 1)',
+        'rgba(233, 30, 99, 0.95)',
+        'rgba(156, 39, 176, 0.9)',
+        'rgba(103, 58, 183, 0.85)',
+        'rgba(63, 81, 181, 0.8)',
+        'rgba(33, 150, 243, 0.75)',
+        'rgba(3, 169, 244, 0.7)',
+        'rgba(0, 188, 212, 0.7)',
+        'rgba(0, 150, 136, 0.75)',
+        'rgba(76, 175, 80, 0.8)',
+        'rgba(139, 195, 74, 0.85)',
+        'rgba(205, 220, 57, 0.9)',
+        'rgba(255, 235, 59, 0.95)',
+        'rgba(255, 193, 7, 1)'
+    ],
+
+    components: {
+
+        // Main components
+        preview: true,
+        opacity: false,
+        hue: true,
+		
+
+        // Input / output Options
+        interaction: {
+            hex: false,
+            rgba: true,
+            hsla: false,
+            hsva: false,
+            cmyk: false,
+            input: false,
+			cancel: true,
+            clear: false,
+            save: true 
+        }
+    },
+	useAsButton: true,
+	lockOpacity: true,
+});
+pickr.on('init', instance => {
+
+    // Grab actual input-element
+    const {result} = instance.getRoot().interaction;
+
+    // Listen to any key-events
+    result.addEventListener('keydown', e => {
+
+        // Detect whever the user pressed "Enter" on their keyboard
+        if (e.key === 'Enter') {
+            instance.applyColor(); // Save the currenly selected color
+            instance.hide(); // Hide modal
+        }
+    }, {capture: true});
+});
+
+pickr.on('save', (color, instance) => {
+	console.log(color.toRGBA());
+	new_color = color.toRGBA();
+
+      var request = new XMLHttpRequest();
+      request.onload = function() {
+          // We could do more interesting things with the response
+          // or, we could ignore it entirely
+          //alert(request.responseText);
+		  console.log(request.responseText);
+      };
+
+      // We point the request at the appropriate command
+      request.open("GET", "https://192.168.200.18:5000/set_color/" + new_color[0].toFixed(0) + "." + new_color[1].toFixed(0) + "." + new_color[2].toFixed(0), true);
+      // and then we send it off
+      request.send();
+});
