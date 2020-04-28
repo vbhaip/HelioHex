@@ -79,6 +79,7 @@ def flash_around():
     return "Flashing around"
 
 @app.route("/set_brightness/<float:b>")
+@app.route("/set_brightness/<int:b>")
 def set_brightness(b):
     display.set_brightness(b)
     return "Brightness set to %f" %b

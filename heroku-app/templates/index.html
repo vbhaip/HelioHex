@@ -4,7 +4,6 @@
 		<title>HelioHex</title>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		<script src="{{ url_for('static', filename='index.js') }}"></script>
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.3/webcomponents.min.js"></script>
 		<!--<link rel="import" href="{{ url_for('static', filename='awesome-button.html') }}">-->
@@ -16,7 +15,9 @@
 				<button type="button" class="button" value="flash_around">Flash Around</button>
 				<button type="button" class="button" value="rainbow_wheel">Rainbow Wheel</button>
 				<button type="button" class="button" value="play_song">Spotify Sync</button>
+				<input type="range" min="0" max="100" value="50" class="slider" id="slider">
 			</div>
 	</body>
+	<script src="{{ url_for('static', filename='index.js') }}"></script>
 </html>
 		

@@ -24,6 +24,8 @@ body {
     outline: none;
     color: black;
 	display: inline-block;
+	margin-left: 30vmin;
+	margin-right: 30vmin;
 }
 
 .button:active {
@@ -34,8 +36,45 @@ body {
 
 .buttons{
     margin: 0 auto;
-    width: 40vmin;
+    width: 100vmin;
     text-align: center;
+	padding: 0;
     
 }
 
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 80vmin;
+  height: 8vh; /* Specified height */
+  background: #FDCA40;
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  display: inline-block;
+  margin: auto;
+  margin-top: 8vh;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 8vh; /* Set a specific slider handle width */
+  height: 8vh; /* Slider handle height */
+  background: #F79824;
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 8vh; /* Set a specific slider handle width */
+  height: 8vh; /* Slider handle height */
+  background: #F79824;
+  cursor: pointer; /* Cursor on hover */
+}

@@ -26,6 +26,7 @@ addEventListener("DOMContentLoaded", function() {
           //alert(request.responseText);
 		  console.log(request.responseText);
       };
+
       // We point the request at the appropriate command
       request.open("GET", "https://192.168.200.18:5000/" + command, true);
       // and then we send it off
@@ -33,3 +34,21 @@ addEventListener("DOMContentLoaded", function() {
     });
   }
 }, true);
+
+
+var slider = document.getElementById("slider");
+slider.onchange = function(){
+      var request = new XMLHttpRequest();
+      request.onload = function() {
+          // We could do more interesting things with the response
+          // or, we could ignore it entirely
+          //alert(request.responseText);
+		  console.log(request.responseText);
+      };
+
+      // We point the request at the appropriate command
+      request.open("GET", "https://192.168.200.18:5000/set_brightness/" + slider.value/100.0, true);
+      // and then we send it off
+      request.send();
+}
+
