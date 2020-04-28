@@ -1,0 +1,33 @@
+.button {
+    /*padding: 0 5vw;*/
+    margin: auto;
+    margin-top: 3.5vh;
+    height: 4vmax;
+    width: 25vw;
+    text-align: center;
+    font-size: 1.35vw;
+    border-radius: 1vw;
+    box-shadow: 0 .5vh #F79824;
+    border: none;
+    background-color: #FDCA40;
+    outline: none;
+    color: black;
+	display: inline-block;
+}
+
+.button:active {
+    box-shadow: 0 .2vh #F79824;
+    transform: translateY(.2vh);
+    border: none;
+}
+
+.buttons{
+    margin: 0 auto;
+    width: 25vw;
+    text-align: center;
+    
+}
+
+body {
+	background-color: #33A1FD;
+}
