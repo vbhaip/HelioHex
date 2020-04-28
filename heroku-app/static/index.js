@@ -27,7 +27,7 @@ addEventListener("DOMContentLoaded", function() {
 		  console.log(request.responseText);
       };
       // We point the request at the appropriate command
-      request.open("GET", "http://192.168.200.18:5000/" + command, true);
+      request.open("GET", "https://192.168.200.18:5000/" + command, true);
       // and then we send it off
       request.send();
     });
