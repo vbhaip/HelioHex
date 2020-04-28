@@ -1,11 +1,22 @@
+
+@import url('https://fonts.googleapis.com/css?family=Abel');
+
+* {
+    font-family: 'Abel';
+}
+
+body {
+	background-color: #33A1FD;
+}
+
 .button {
     /*padding: 0 5vw;*/
     margin: auto;
-    margin-top: 3.5vh;
-    height: 4vmax;
-    width: 25vw;
+    margin-top: 8vh;
+    height: 8vh;
+    width: 40vmin;
     text-align: center;
-    font-size: 1.35vw;
+    font-size: 2vmax;
     border-radius: 1vw;
     box-shadow: 0 .5vh #F79824;
     border: none;
@@ -23,11 +34,8 @@
 
 .buttons{
     margin: 0 auto;
-    width: 25vw;
+    width: 40vmin;
     text-align: center;
     
 }
 
-body {
-	background-color: #33A1FD;
-}
