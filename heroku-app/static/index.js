@@ -28,7 +28,7 @@ addEventListener("DOMContentLoaded", function() {
       };
 
       // We point the request at the appropriate command
-      request.open("GET", "https://192.168.200.18:5000/" + command, true);
+      request.open("GET", "http://192.168.200.18:5000/" + command, true);
       // and then we send it off
       request.send();
     });
@@ -47,7 +47,7 @@ slider.onchange = function(){
       };
 
       // We point the request at the appropriate command
-      request.open("GET", "https://192.168.200.18:5000/set_brightness/" + slider.value/100.0, true);
+      request.open("GET", "http://192.168.200.18:5000/set_brightness/" + slider.value/100.0, true);
       // and then we send it off
       request.send();
 }
@@ -127,7 +127,7 @@ pickr.on('save', (color, instance) => {
       };
 
       // We point the request at the appropriate command
-      request.open("GET", "https://192.168.200.18:5000/set_color/" + new_color[0].toFixed(0) + "." + new_color[1].toFixed(0) + "." + new_color[2].toFixed(0), true);
+      request.open("GET", "http://192.168.200.18:5000/set_color/" + new_color[0].toFixed(0) + "." + new_color[1].toFixed(0) + "." + new_color[2].toFixed(0), true);
       // and then we send it off
       request.send();
 });

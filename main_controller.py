@@ -99,7 +99,7 @@ def main():
     #print(app.request.host_url)
     context = ('cert.pem', 'key.pem')
     app.secret_key = CREDENTIALS['FLASK_SECRET_KEY']
-    app.run(host="0.0.0.0", port=5000, ssl_context=context)
+    app.run(host="0.0.0.0", port=5000)
 
 if __name__ == "__main__":
     main()
