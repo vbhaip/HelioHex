@@ -9,6 +9,10 @@ body {
 	background-color: #33A1FD;
 }
 
+html, body{
+	overflow: hidden;
+}
+
 .button {
     /*padding: 0 5vw;*/
     margin: auto;
@@ -77,4 +81,28 @@ body {
   height: 8vh; /* Slider handle height */
   background: #F79824;
   cursor: pointer; /* Cursor on hover */
+}
+
+.pcr-app{
+	width: 50vmin !important;
+	height: 60vmin !important;
+}
+
+.pcr-selection{ 
+	height: 35vmin !important;
+
+}
+
+.pcr-swatches *{
+	height: vmin !important;
+	width: 3vmin !important
+}
+
+.pcr-interaction{
+	height: 20vmin !important
+}
+
+.pcr-interaction * {
+	height: 8vmin !important;
+	width: 10vmin !important;
 }
