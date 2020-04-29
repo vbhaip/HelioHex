@@ -94,7 +94,7 @@ html, body{
 }
 
 .pcr-swatches *{
-	height: vmin !important;
+	height: 3vmin !important;
 	width: 3vmin !important
 }
 
@@ -105,4 +105,15 @@ html, body{
 .pcr-interaction * {
 	height: 8vmin !important;
 	width: 10vmin !important;
+	font-size: 2.5vmin !important;
+}
+
+
+.pcr-color-chooser {
+    height: 2vmin !important;
+}
+
+.pcr-color-preview {
+	height: 5vmin !important;
+	font-size: 2vmin !important;
 }
