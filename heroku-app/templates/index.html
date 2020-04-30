@@ -11,6 +11,7 @@
 	</head>
 
 	<body>
+		<div id="drawing"></div>
 			<div class="buttons">
 				<button type="button" class="button" value="set_color/255.255.0" id="set_color">Set Color</button>
 				<button type="button" class="button basic_button" value="flash_around">Flash Around</button>
@@ -19,6 +20,7 @@
 				<input type="range" min="0" max="100" value="50" class="slider" id="slider">
 			</div>
 	</body>
+	<script src="{{ url_for('static', filename='two.js') }}"></script>
 	<script src="{{ url_for('static', filename='index.js') }}"></script>
 </html>
 		
