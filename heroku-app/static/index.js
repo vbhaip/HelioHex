@@ -172,6 +172,18 @@ function resizeStructure(){
 
 }
 
+function attachHexagonClickEvents(){
+	for(let i = 0; i < hexagons.children.length; i++){
+
+		let hex_id = hexagons.children[i].id;
+		
+		//attaches a function to each of the hexagons
+		$('#' + hex_id).click(function (){
+			console.log("Clicked on " + hex_id);
+		});
+	}
+}
+
 function drawStructure(){
 	let x = 250;
 	let y = 250;
@@ -194,7 +206,10 @@ function drawStructure(){
 		makeHex(x, y, r);
 	}
 	resizeStructure();
+	attachHexagonClickEvents();
 }
+
+
 
 
 drawStructure();
