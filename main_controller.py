@@ -76,6 +76,16 @@ def set_color(rgb):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
+@app.route("/set_hex_color/<int:hex_num>/<string:rgb>")
+@end_current_thread
+def set_hex_color(hex_num, rgb):
+    color = tuple(int(x) for x in rgb.split("."))
+    display.hexagons[hex_num].set_color(color)
+    response = jsonify({"data": "Color set to %s" % str(color)})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+
+
 @app.route("/flash_around")
 @end_current_thread
 def flash_around():

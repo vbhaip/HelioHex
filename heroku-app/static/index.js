@@ -153,7 +153,9 @@ function makePickr(id, endpoint){
 			  console.log(request.responseText);
 		  };
 
-
+		  if(endpoint == "set_hex_color"){
+			  endpoint = endpoint + "/" + (parseInt(id.substring(4))-2).toString();
+		  }
 		  // We point the request at the appropriate command
 		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
 		  // and then we send it off
