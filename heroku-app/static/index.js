@@ -53,88 +53,6 @@ slider.onchange = function(){
 }
 
 
-const pickr = Pickr.create({
-    el: '#set_color',
-    theme: 'nano', // or 'monolith', or 'nano'
-
-    swatches: [
-        'rgba(244, 67, 54, 1)',
-        'rgba(233, 30, 99, 0.95)',
-        'rgba(156, 39, 176, 0.9)',
-        'rgba(103, 58, 183, 0.85)',
-        'rgba(63, 81, 181, 0.8)',
-        'rgba(33, 150, 243, 0.75)',
-        'rgba(3, 169, 244, 0.7)',
-        'rgba(0, 188, 212, 0.7)',
-        'rgba(0, 150, 136, 0.75)',
-        'rgba(76, 175, 80, 0.8)',
-        'rgba(139, 195, 74, 0.85)',
-        'rgba(205, 220, 57, 0.9)',
-        'rgba(255, 235, 59, 0.95)',
-        'rgba(255, 193, 7, 1)'
-    ],
-
-    components: {
-
-        // Main components
-        preview: true,
-        opacity: false,
-        hue: true,
-		
-
-        // Input / output Options
-        interaction: {
-            hex: false,
-            rgba: false,
-            hsla: false,
-            hsva: false,
-            cmyk: false,
-            input: false,
-			cancel: true,
-            clear: false,
-            save: true 
-        }
-    },
-	useAsButton: true,
-	lockOpacity: true,
-});
-pickr.on('init', instance => {
-
-    // Grab actual input-element
-    const {result} = instance.getRoot().interaction;
-
-    // Listen to any key-events
-    result.addEventListener('keydown', e => {
-
-        // Detect whever the user pressed "Enter" on their keyboard
-        if (e.key === 'Enter') {
-            instance.applyColor(); // Save the currenly selected color
-            instance.hide(); // Hide modal
-        }
-    }, {capture: true});
-});
-
-pickr.on('save', (color, instance) => {
-	console.log(color.toRGBA());
-	new_color = color.toRGBA();
-
-      var request = new XMLHttpRequest();
-      request.onload = function() {
-          // We could do more interesting things with the response
-          // or, we could ignore it entirely
-          //alert(request.responseText);
-		  console.log(request.responseText);
-      };
-
-      // We point the request at the appropriate command
-      request.open("GET", "http://192.168.200.18:5000/set_color/" + new_color[0].toFixed(0) + "." + new_color[1].toFixed(0) + "." + new_color[2].toFixed(0), true);
-      // and then we send it off
-      request.send();
-});
-
-
-
-
 
 
 let h = $(window).height()*.3;
@@ -143,10 +61,127 @@ let elem = document.getElementById('drawing');
 let two = new Two({ width: $(document).width(), height: h}).appendTo(elem);
 let hexagons = two.makeGroup();
 
+
+function updateHexDiagram(hex_ind, color){
+	console.log(hex_ind);
+	console.log(hexagons.children);
+	hexagons.children[hex_ind].fill = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+	two.update();
+}
+
+
+function makePickr(id, endpoint){
+	const pickr = Pickr.create({
+		el: '#' + id,
+		theme: 'nano', // or 'monolith', or 'nano'
+
+		swatches: [
+			'rgba(244, 67, 54, 1)',
+			'rgba(233, 30, 99, 0.95)',
+			'rgba(156, 39, 176, 0.9)',
+			'rgba(103, 58, 183, 0.85)',
+			'rgba(63, 81, 181, 0.8)',
+			'rgba(33, 150, 243, 0.75)',
+			'rgba(3, 169, 244, 0.7)',
+			'rgba(0, 188, 212, 0.7)',
+			'rgba(0, 150, 136, 0.75)',
+			'rgba(76, 175, 80, 0.8)',
+			'rgba(139, 195, 74, 0.85)',
+			'rgba(205, 220, 57, 0.9)',
+			'rgba(255, 235, 59, 0.95)',
+			'rgba(255, 193, 7, 1)'
+		],
+
+		components: {
+
+			// Main components
+			preview: true,
+			opacity: false,
+			hue: true,
+			
+
+			// Input / output Options
+			interaction: {
+				hex: false,
+				rgba: false,
+				hsla: false,
+				hsva: false,
+				cmyk: false,
+				input: false,
+				cancel: true,
+				clear: false,
+				save: true 
+			}
+		},
+		useAsButton: true,
+		lockOpacity: true,
+		strings: {
+			save: "Save",
+			cancel: "Exit",
+		}
+	});
+	pickr.on('init', instance => {
+
+		// Grab actual input-element
+		const {result} = instance.getRoot().interaction;
+
+		// Listen to any key-events
+		result.addEventListener('keydown', e => {
+
+			// Detect whever the user pressed "Enter" on their keyboard
+			if (e.key === 'Enter') {
+				instance.applyColor(); // Save the currenly selected color
+				instance.hide(); // Hide modal
+			}
+		}, {capture: true});
+	});
+
+	pickr.on('save', (color, instance) => {
+		console.log(color.toRGBA());
+		new_color = color.toRGBA();
+		
+		new_color.pop();
+		for(let i = 0; i < 3; i++){
+			new_color[i] = new_color[i].toFixed(0);
+		}
+
+		  var request = new XMLHttpRequest();
+		  request.onload = function() {
+			  // We could do more interesting things with the response
+			  // or, we could ignore it entirely
+			  //alert(request.responseText);
+			  console.log(request.responseText);
+		  };
+
+
+		  // We point the request at the appropriate command
+		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
+		  // and then we send it off
+		  request.send();
+		  
+		  if(endpoint == "set_hex_color"){
+			  updateHexDiagram(parseInt(id.substring(4)) - 2, new_color);
+		  }
+		  else if(endpoint == "set_color"){
+			  for(let a = 0; a < hexagons.children.length; a++){
+				  updateHexDiagram(a, new_color);
+			  }
+		  }
+		
+	});
+	pickr.on('cancel', () => {
+		pickr.hide();
+	});
+
+}
+
+makePickr("set_color", "set_color");
+
+
 function makeHex(x, y, r){
 	let hex = two.makePolygon(x, h-y, r, 6);	
-	hex.fill = '#FF8000';
-	hex.stroke = 'orangered';
+	hex.fill = 'white';
+	hex.stroke = 'black';
 	hexagons.add(hex);
 }
 
@@ -177,10 +212,15 @@ function attachHexagonClickEvents(){
 
 		let hex_id = hexagons.children[i].id;
 		
+		makePickr(hex_id, "set_hex_color");
+
+		//which hex num it is, starting w 0
+		let hex_num = parseInt(hex_id.substring(4));
 		//attaches a function to each of the hexagons
 		$('#' + hex_id).click(function (){
 			console.log("Clicked on " + hex_id);
 		});
+
 	}
 }
 
@@ -195,14 +235,14 @@ function drawStructure(){
 	let connection;
 	for (let i = 0; i < path.length; i++){
 		connection = path[i];
-		console.log(connection);
+		//console.log(connection);
 		theta = Math.PI/180*((210-60*connection)%360);
 		x = x + Math.sqrt(3)*r*Math.cos(theta);
 		y = y + Math.sqrt(3)*r*Math.sin(theta);
-		console.log(theta);
-		console.log(x);
-		console.log(y);
-		console.log("___");
+		//console.log(theta);
+		//console.log(x);
+		//console.log(y);
+		//console.log("___");
 		makeHex(x, y, r);
 	}
 	resizeStructure();
