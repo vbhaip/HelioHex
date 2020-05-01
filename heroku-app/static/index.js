@@ -154,14 +154,6 @@ function makePickr(id, endpoint){
 		  };
 
 		  if(endpoint == "set_hex_color"){
-			  endpoint = endpoint + "/" + (parseInt(id.substring(4))-2).toString();
-		  }
-		  // We point the request at the appropriate command
-		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
-		  // and then we send it off
-		  request.send();
-		  
-		  if(endpoint == "set_hex_color"){
 			  updateHexDiagram(parseInt(id.substring(4)) - 2, new_color);
 		  }
 		  else if(endpoint == "set_color"){
@@ -169,6 +161,14 @@ function makePickr(id, endpoint){
 				  updateHexDiagram(a, new_color);
 			  }
 		  }
+
+		  if(endpoint == "set_hex_color"){
+			  endpoint = endpoint + "/" + (parseInt(id.substring(4))-2).toString();
+		  }
+		  // We point the request at the appropriate command
+		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
+		  // and then we send it off
+		  request.send();
 		
 	});
 	pickr.on('cancel', () => {
@@ -219,9 +219,9 @@ function attachHexagonClickEvents(){
 		//which hex num it is, starting w 0
 		let hex_num = parseInt(hex_id.substring(4));
 		//attaches a function to each of the hexagons
-		$('#' + hex_id).click(function (){
-			console.log("Clicked on " + hex_id);
-		});
+		//$('#' + hex_id).click(function (){
+		//	console.log("Clicked on " + hex_id);
+		//});
 
 	}
 }
