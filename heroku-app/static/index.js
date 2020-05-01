@@ -19,7 +19,7 @@ addEventListener("DOMContentLoaded", function() {
       // AJAX (Asynchronous JavaScript And XML)
       // We will create a new request object
       // and set up a handler for the response
-      var request = new XMLHttpRequest();
+      let request = new XMLHttpRequest();
       request.onload = function() {
           // We could do more interesting things with the response
           // or, we could ignore it entirely
@@ -38,7 +38,7 @@ addEventListener("DOMContentLoaded", function() {
 
 var slider = document.getElementById("slider");
 slider.onchange = function(){
-      var request = new XMLHttpRequest();
+      let request = new XMLHttpRequest();
       request.onload = function() {
           // We could do more interesting things with the response
           // or, we could ignore it entirely
@@ -147,14 +147,6 @@ function makePickr(id, endpoint){
 			new_color[i] = new_color[i].toFixed(0);
 		}
 
-		  var request = new XMLHttpRequest();
-		  request.onload = function() {
-			  // We could do more interesting things with the response
-			  // or, we could ignore it entirely
-			  //alert(request.responseText);
-			  console.log(request.responseText);
-		  };
-		  
 		  if(orig_endpoint == "set_hex_color"){
 			  console.log("jaunted");
 			  updateHexDiagram(parseInt(id.substring(4)) - 2, new_color);
@@ -168,6 +160,15 @@ function makePickr(id, endpoint){
 		  if(endpoint == "set_hex_color"){
 			  endpoint = endpoint + "/" + (parseInt(id.substring(4))-2).toString();
 		  }
+
+		  let request = new XMLHttpRequest();
+		  request.onload = function() {
+			  // We could do more interesting things with the response
+			  // or, we could ignore it entirely
+			  //alert(request.responseText);
+			  console.log(request.responseText);
+		  };
+		  
 		  // We point the request at the appropriate command
 		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
 		  // and then we send it off
@@ -252,13 +253,43 @@ function drawStructure(){
 	}
 	resizeStructure();
 	attachHexagonClickEvents();
+    updateHexColors();
+
+
 }
 
+function updateHexColors(){
 
+	  let request = new XMLHttpRequest();
+	  request.onload = function() {
+		  // We could do more interesting things with the response
+		  // or, we could ignore it entirely
+		  //alert(request.responseText);
+		  console.log(request.responseText);
+	  };
+	 
+
+      request.onreadystatechange = function() {
+	      if (this.readyState == 4 && this.status == 200) {
+              let parsed = JSON.parse(this.responseText)['data'];
+              console.log(parsed);
+              for(let i = 0; i < hexagons.children.length; i++){
+                  updateHexDiagram(i, parsed[i]);
+              }
+	      }
+	  }; 
+
+
+	  // We point the request at the appropriate command
+	  request.open("GET", "http://192.168.200.18:5000/get_hex_colors",  true);
+	  // and then we send it off
+	  request.send();
+	
+
+}
 
 
 drawStructure();
 
 window.addEventListener('resize', resizeStructure, true);
-
 
