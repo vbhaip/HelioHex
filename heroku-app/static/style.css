@@ -16,7 +16,7 @@ html, body{
 .button {
     /*padding: 0 5vw;*/
     margin: auto;
-    margin-top: 8vh;
+    margin-top: 4vh;
     height: 8vh;
     width: 40vmin;
     text-align: center;
@@ -58,7 +58,7 @@ html, body{
   transition: opacity .2s;
   display: inline-block;
   margin: auto;
-  margin-top: 8vh;
+  margin-top: 4vh;
 }
 
 /* Mouse-over effects */

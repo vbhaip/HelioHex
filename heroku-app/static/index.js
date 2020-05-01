@@ -132,46 +132,73 @@ pickr.on('save', (color, instance) => {
       request.send();
 });
 
-let h = $(window).height()*.4;
+
+
+
+
+
+let h = $(window).height()*.3;
 
 let elem = document.getElementById('drawing');
 let two = new Two({ width: $(document).width(), height: h}).appendTo(elem);
-let group = two.makeGroup();
+let hexagons = two.makeGroup();
 
 function makeHex(x, y, r){
 	let hex = two.makePolygon(x, h-y, r, 6);	
 	hex.fill = '#FF8000';
 	hex.stroke = 'orangered';
-	group.add(hex);
-	return hex;
+	hexagons.add(hex);
 }
 
 let path = [3, 2, 4, 2, 2, 4, 4]
 
-let connection;
 
 
-let x = 250;
-let y = 250;
-let r = 30;
+function resizeStructure(){
+	two.height = $(window).height()*.3;
+	two.width = $(window).width();
+	hexagons.translation.set(0,0);
+	hexagons.scale = 1;
+	hexagons.center();
+	hexagons.translation.set(two.width / 2, two.height / 2);
+	
+	let bounds = hexagons.getBoundingClientRect();
+	let bound_h = bounds['height'];
+	let bound_w = bounds['width'];
 
-makeHex(x, y, r);
+	//This adjusts the hexagons to fit into the canvas no matter what
+	hexagons.scale = Math.min(two.height/bound_h, two.width/bound_w);
+	two.update();
 
-let theta = 0;
-for (let i = 0; i < path.length; i++){
-	connection = path[i];
-	console.log(connection);
-	theta = Math.PI/180*((210-60*connection)%360);
-	x = x + Math.sqrt(3)*r*Math.cos(theta);
-	y = y + Math.sqrt(3)*r*Math.sin(theta);
-	console.log(theta);
-	console.log(x);
-	console.log(y);
-	console.log("___");
+}
+
+function drawStructure(){
+	let x = 250;
+	let y = 250;
+	let r = 60
+	
 	makeHex(x, y, r);
+
+	let theta = 0;
+	let connection;
+	for (let i = 0; i < path.length; i++){
+		connection = path[i];
+		console.log(connection);
+		theta = Math.PI/180*((210-60*connection)%360);
+		x = x + Math.sqrt(3)*r*Math.cos(theta);
+		y = y + Math.sqrt(3)*r*Math.sin(theta);
+		console.log(theta);
+		console.log(x);
+		console.log(y);
+		console.log("___");
+		makeHex(x, y, r);
+	}
+	resizeStructure();
 }
 
 
-group.center();
-group.translation.set(two.width / 2, two.height / 2);
-two.update();
+drawStructure();
+
+window.addEventListener('resize', resizeStructure, true);
+
+
