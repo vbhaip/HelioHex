@@ -71,6 +71,8 @@ function updateHexDiagram(hex_ind, color){
 
 
 function makePickr(id, endpoint){
+	let orig_endpoint = endpoint;
+
 	const pickr = Pickr.create({
 		el: '#' + id,
 		theme: 'nano', // or 'monolith', or 'nano'
@@ -152,8 +154,9 @@ function makePickr(id, endpoint){
 			  //alert(request.responseText);
 			  console.log(request.responseText);
 		  };
-
-		  if(endpoint == "set_hex_color"){
+		  
+		  if(orig_endpoint == "set_hex_color"){
+			  console.log("jaunted");
 			  updateHexDiagram(parseInt(id.substring(4)) - 2, new_color);
 		  }
 		  else if(endpoint == "set_color"){
@@ -217,7 +220,7 @@ function attachHexagonClickEvents(){
 		makePickr(hex_id, "set_hex_color");
 
 		//which hex num it is, starting w 0
-		let hex_num = parseInt(hex_id.substring(4));
+		//let hex_num = parseInt(hex_id.substring(4));
 		//attaches a function to each of the hexagons
 		//$('#' + hex_id).click(function (){
 		//	console.log("Clicked on " + hex_id);
