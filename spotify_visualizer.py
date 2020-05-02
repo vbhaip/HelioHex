@@ -109,12 +109,13 @@ class SpotifyVisualizer:
         #self.track_info = self.sp.current_user_playing_track()
         self.track_info = self.sp.current_playback()
         if(self.track_info != None):
-            self.should_sync = True
-            self.should_update_playback = True
 
             temp_track = self.track_info['item']['uri']
             if self.track is None: 
                 self.track = temp_track 
+                self.get_track_analysis()
+                self.should_sync = True
+                self.should_update_playback = True
 
             #this deals with if we switch songs
             elif self.track != temp_track:
@@ -130,7 +131,7 @@ class SpotifyVisualizer:
             #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
             self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
         else:
-            print("Please play a song to start.\n\n")
+            print("Please play a song to start.\n")
 
     def continuous_refresh_spotify_data(self):
         while self.should_run_visualizer: 
@@ -256,6 +257,8 @@ class SpotifyVisualizer:
                 curr = perf_counter()
                 #self.get_current_track()
                 #self.pos += (perf_counter() - curr)
+                #print(len(self.time_vals))
+                #print(len(self.loudness_vals))
                 curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
                 if VERBOSE:
                     print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
@@ -291,7 +294,7 @@ class SpotifyVisualizer:
 
         self.authenticate()
         self.get_current_track()
-        self.get_track_analysis()
+        #self.get_track_analysis()
  
         self.threads = []
         self.threads.append(Thread(target=self.continuous_refresh_spotify_data))
