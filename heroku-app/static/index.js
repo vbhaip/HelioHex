@@ -1,59 +1,50 @@
 //https://stackoverflow.com/questions/21566649/flask-button-run-python-without-refreshing-page
 // Only run what comes next *after* the page has loaded
 addEventListener("DOMContentLoaded", function() {
+    
 
-  var buttons = document.querySelectorAll(".basic_button");
-  for (var i=0, l=buttons.length; i<l; i++) {
-    var button = buttons[i];
-    // For each button, listen for the "click" event
-    button.addEventListener("click", function(e) {
-      // When a click happens, stop the button
-      // from submitting our form (if we have one)
-      e.preventDefault();
+    let buttons = document.querySelectorAll(".basic_button");
+    for (let i=0, l=buttons.length; i<l; i++) {
+        let button = buttons[i];
+        // For each button, listen for the "click" event
+        button.addEventListener("click", function(e) {
+          // When a click happens, stop the button
+          // from submitting our form (if we have one)
+            e.preventDefault();
 
-      var clickedButton = e.target;
-      var command = clickedButton.value;
+            let clickedButton = e.target;
+            let command = clickedButton.value;
 
-      // Now we need to send the data to our server
-      // without reloading the page - this is the domain of
-      // AJAX (Asynchronous JavaScript And XML)
-      // We will create a new request object
-      // and set up a handler for the response
-      let request = new XMLHttpRequest();
-      request.onload = function() {
-          // We could do more interesting things with the response
-          // or, we could ignore it entirely
-          //alert(request.responseText);
-		  console.log(request.responseText);
-      };
-
-      // We point the request at the appropriate command
-      request.open("GET", "http://192.168.200.18:5000/" + command, true);
-      // and then we send it off
-      request.send();
-    });
-  }
+            disableInteractions();
+            $.ajax({
+                async: true,
+                url: "http://192.168.200.18:5000/" + command,
+                cache: false,
+                success: function(result){
+                    enableInteractions();
+                    if(button.id != "flash_around"){
+                        clearVisualization();
+                    }
+                }
+            });
+        });
+    }
 }, true);
 
 
 var slider = document.getElementById("slider");
 slider.onchange = function(){
-      let request = new XMLHttpRequest();
-      request.onload = function() {
-          // We could do more interesting things with the response
-          // or, we could ignore it entirely
-          //alert(request.responseText);
-		  console.log(request.responseText);
-      };
-
-      // We point the request at the appropriate command
-      request.open("GET", "http://192.168.200.18:5000/set_brightness/" + slider.value/100.0, true);
-      // and then we send it off
-      request.send();
+    
+    disableInteractions();
+    $.ajax({
+        async: false,
+        url: "http://192.168.200.18:5000/set_brightness/" + slider.value/100.0,
+        cache: false,
+        success: function(result){
+            enableInteractions();
+        }
+    });
 }
-
-
-
 
 let h = $(window).height()*.3;
 
@@ -61,12 +52,20 @@ let elem = document.getElementById('drawing');
 let two = new Two({ width: $(document).width(), height: h}).appendTo(elem);
 let hexagons = two.makeGroup();
 
+var disabled = false;
+
 
 function updateHexDiagram(hex_ind, color){
-	console.log(hex_ind);
-	console.log(hexagons.children);
+	//console.log(hex_ind);
+	//console.log(hexagons.children);
 	hexagons.children[hex_ind].fill = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
 	two.update();
+}
+
+function clearVisualization(){
+    for(let i = 0; i < hexagons.children.length; i++){
+        updateHexDiagram(i, [255,255,255]);
+    }
 }
 
 
@@ -79,18 +78,18 @@ function makePickr(id, endpoint){
 
 		swatches: [
 			'rgba(244, 67, 54, 1)',
-			'rgba(233, 30, 99, 0.95)',
-			'rgba(156, 39, 176, 0.9)',
-			'rgba(103, 58, 183, 0.85)',
-			'rgba(63, 81, 181, 0.8)',
-			'rgba(33, 150, 243, 0.75)',
-			'rgba(3, 169, 244, 0.7)',
-			'rgba(0, 188, 212, 0.7)',
-			'rgba(0, 150, 136, 0.75)',
-			'rgba(76, 175, 80, 0.8)',
-			'rgba(139, 195, 74, 0.85)',
-			'rgba(205, 220, 57, 0.9)',
-			'rgba(255, 235, 59, 0.95)',
+			'rgba(233, 30, 99, 1)',
+			'rgba(156, 39, 176, 1)',
+			'rgba(103, 58, 183, 1)',
+			'rgba(63, 81, 181, 1)',
+			'rgba(33, 150, 243, 1)',
+			//'rgba(3, 169, 244, 1)',
+			//'rgba(0, 188, 212, 1)',
+			//'rgba(0, 150, 136, 1)',
+			//'rgba(76, 175, 80, 1)',
+			//'rgba(139, 195, 74, 1)',
+			'rgba(205, 220, 57, 1)',
+			'rgba(255, 235, 59, 1)',
 			'rgba(255, 193, 7, 1)'
 		],
 
@@ -123,7 +122,6 @@ function makePickr(id, endpoint){
 		}
 	});
 	pickr.on('init', instance => {
-
 		// Grab actual input-element
 		const {result} = instance.getRoot().interaction;
 
@@ -148,7 +146,6 @@ function makePickr(id, endpoint){
 		}
 
 		  if(orig_endpoint == "set_hex_color"){
-			  console.log("jaunted");
 			  updateHexDiagram(parseInt(id.substring(4)) - 2, new_color);
 		  }
 		  else if(endpoint == "set_color"){
@@ -160,24 +157,29 @@ function makePickr(id, endpoint){
 		  if(endpoint == "set_hex_color"){
 			  endpoint = endpoint + "/" + (parseInt(id.substring(4))-2).toString();
 		  }
-
-		  let request = new XMLHttpRequest();
-		  request.onload = function() {
-			  // We could do more interesting things with the response
-			  // or, we could ignore it entirely
-			  //alert(request.responseText);
-			  console.log(request.responseText);
-		  };
-		  
-		  // We point the request at the appropriate command
-		  request.open("GET", "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2], true);
-		  // and then we send it off
-		  request.send();
+          disableInteractions();
+          $.ajax({
+              async: true,
+              url: "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
+              cache: false,
+              success: function(result){
+                  enableInteractions();
+              }
+          });
 		
 	});
 	pickr.on('cancel', () => {
 		pickr.hide();
 	});
+    pickr.on('show', () => {
+        
+        //doesn't show pickr if we want buttons disabled
+        if(disabled){
+            pickr.hide();
+            return;
+        }
+
+    });
 
 }
 
@@ -198,7 +200,7 @@ function updatePath(){
     $.ajax({
         async: false,
         url: "http://192.168.200.18:5000/get_path",
-        catche: false,
+        cache: false,
         success: function(result){
             path = result['data']['path'];
         }
@@ -269,18 +271,18 @@ function drawStructure(){
 	}
 	resizeStructure();
 	attachHexagonClickEvents();
-    updateHexColors();
-    updateBrightnessSlider();
+    getHexColors();
+    getBrightnessSlider();
 
 
 }
 
-function updateHexColors(){
+function getHexColors(){
     
     $.ajax({
         async: false,
         url: "http://192.168.200.18:5000/get_hex_colors",
-        catche: false,
+        cache: false,
         success: function(result){
             for(let i = 0; i < hexagons.children.length; i++){
                 updateHexDiagram(i, result['data'][i]);
@@ -291,17 +293,55 @@ function updateHexColors(){
 
 }
 
-function updateBrightnessSlider(){
-
+function getBrightnessSlider(){
+    
     $.ajax({
         async: false,
         url: "http://192.168.200.18:5000/get_brightness",
-        catche: false,
+        cache: false,
         success: function(result){
             slider.value = ((parseInt(result['data']['brightness']*100)).toFixed(0));
         }
     });
 
+}
+
+function disableVisualization(){
+    hexagons.opacity = 0.5;
+    disabled = true;
+    two.update();
+
+}
+
+function enableVisualization(){
+    hexagons.opacity = 1;
+    disabled = false;
+    two.update()
+
+}
+
+function disableInteractions(){
+    disableVisualization();
+    
+
+    var buttons = document.querySelectorAll(".button");
+    for (var i=0, l=buttons.length; i<l; i++) {
+        buttons[i].disabled = true;
+    }
+    slider.disabled = true;
+
+
+}
+
+function enableInteractions(){
+    enableVisualization();
+
+
+    var buttons = document.querySelectorAll(".button");
+    for (var i=0, l=buttons.length; i<l; i++) {
+        buttons[i].disabled = false;
+    }
+    slider.disabled = false;
 }
 
 

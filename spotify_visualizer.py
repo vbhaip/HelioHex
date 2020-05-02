@@ -102,7 +102,7 @@ class SpotifyVisualizer:
         loc = np.searchsorted(x, x_val)
         f = interp_fxns[loc-1]
 
-        return f(x_val)
+        return float(f(x_val))
     
     def get_current_track(self):
         curr = perf_counter()
