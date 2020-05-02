@@ -90,7 +90,7 @@ function makePickr(id, endpoint){
 			//'rgba(139, 195, 74, 1)',
 			'rgba(205, 220, 57, 1)',
 			'rgba(255, 235, 59, 1)',
-			'rgba(255, 193, 7, 1)'
+            //'rgba(255, 193, 7, 1)'
 		],
 
 		components: {

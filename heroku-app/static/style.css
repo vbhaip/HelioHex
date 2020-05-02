@@ -103,9 +103,18 @@ html, body{
 
 }
 
+.pcr-swatches {
+    display: inline !important;
+	height: 4vmin !important;
+	margin: 1vmin !important;
+
+}
+
 .pcr-swatches *{
 	height: 3vmin !important;
-	width: 3vmin !important
+	width: 3vmin !important;
+	padding: 1vmin !important;
+	margin: 0.5vmin !important;
 }
 
 .pcr-interaction{
