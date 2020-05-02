@@ -191,9 +191,22 @@ function makeHex(x, y, r){
 	hexagons.add(hex);
 }
 
-let path = [3, 2, 4, 2, 2, 4, 4]
+let path = []
 
+function updatePath(){
+      
+    $.ajax({
+        async: false,
+        url: "http://192.168.200.18:5000/get_path",
+        catche: false,
+        success: function(result){
+            path = result['data']['path'];
+        }
+    });
 
+	
+
+}
 
 function resizeStructure(){
 	two.height = $(window).height()*.3;
@@ -231,6 +244,9 @@ function attachHexagonClickEvents(){
 }
 
 function drawStructure(){
+
+    updatePath();
+
 	let x = 250;
 	let y = 250;
 	let r = 60
@@ -260,64 +276,34 @@ function drawStructure(){
 }
 
 function updateHexColors(){
-
-	  let request = new XMLHttpRequest();
-	  request.onload = function() {
-		  // We could do more interesting things with the response
-		  // or, we could ignore it entirely
-		  //alert(request.responseText);
-		  console.log(request.responseText);
-	  };
-	 
-
-      request.onreadystatechange = function() {
-	      if (this.readyState == 4 && this.status == 200) {
-              let parsed = JSON.parse(this.responseText)['data'];
-              console.log(parsed);
-              for(let i = 0; i < hexagons.children.length; i++){
-                  updateHexDiagram(i, parsed[i]);
-              }
-	      }
-	  }; 
-
-
-	  // We point the request at the appropriate command
-	  request.open("GET", "http://192.168.200.18:5000/get_hex_colors",  true);
-	  // and then we send it off
-	  request.send();
+    
+    $.ajax({
+        async: false,
+        url: "http://192.168.200.18:5000/get_hex_colors",
+        catche: false,
+        success: function(result){
+            for(let i = 0; i < hexagons.children.length; i++){
+                updateHexDiagram(i, result['data'][i]);
+            }
+        }
+    });
 	
 
 }
 
 function updateBrightnessSlider(){
 
-	  let request = new XMLHttpRequest();
-	  request.onload = function() {
-		  // We could do more interesting things with the response
-		  // or, we could ignore it entirely
-		  //alert(request.responseText);
-		  console.log(request.responseText);
-	  };
-	 
-
-      request.onreadystatechange = function() {
-	      if (this.readyState == 4 && this.status == 200) {
-              let parsed = JSON.parse(this.responseText)['data'];
-              console.log(parsed);
-
-              slider.val((parseInt(parsed['brightness']*100)).toFixed(0));
-
-	      }
-	  }; 
-
-
-	  // We point the request at the appropriate command
-	  request.open("GET", "http://192.168.200.18:5000/get_brightness",  true);
-	  // and then we send it off
-	  request.send();
-	
+    $.ajax({
+        async: false,
+        url: "http://192.168.200.18:5000/get_brightness",
+        catche: false,
+        success: function(result){
+            slider.value = ((parseInt(result['data']['brightness']*100)).toFixed(0));
+        }
+    });
 
 }
+
 
 drawStructure();
 
