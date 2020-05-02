@@ -160,12 +160,17 @@ class Hexagon:
             self.set_color(new_color, show=False)
             sleep(delay)
 
+    def __repr__(self):
+       return str(self.start/(LED_HEX))
 
 class Structure:
 
     def __init__(self):
         self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
         
+        self.randomized_hexagons = self.hexagons.copy()
+        random.shuffle(self.randomized_hexagons)
+        print(self.randomized_hexagons)
         
         for key in settings.OFFSETS:
             self.hexagons[key].offset = settings.OFFSETS[key]

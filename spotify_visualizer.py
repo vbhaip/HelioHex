@@ -231,10 +231,11 @@ class SpotifyVisualizer:
 
         ind = self.key 
         threads = []
+        
         for i in range(0, lc.HEX_COUNT):
             if uniform is False:
                 ind = i
-            self.display.hexagons[i].set_color(self.get_color_from_rgb_interp(r, g, b, ind), show=False)
+            self.display.randomized_hexagons[i].set_color(self.get_color_from_rgb_interp(r, g, b, ind + 0.5), show=False)
             #t = Thread(target=self.display.hexagons[i].fade, args=(self.display.hexagons[i].color, self.get_color_from_rgb_interp(r,g,b,ind), 5, self.refresh_rate/2))
             #threads.append(t)
 
