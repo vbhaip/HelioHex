@@ -254,6 +254,7 @@ function drawStructure(){
 	resizeStructure();
 	attachHexagonClickEvents();
     updateHexColors();
+    updateBrightnessSlider();
 
 
 }
@@ -288,6 +289,35 @@ function updateHexColors(){
 
 }
 
+function updateBrightnessSlider(){
+
+	  let request = new XMLHttpRequest();
+	  request.onload = function() {
+		  // We could do more interesting things with the response
+		  // or, we could ignore it entirely
+		  //alert(request.responseText);
+		  console.log(request.responseText);
+	  };
+	 
+
+      request.onreadystatechange = function() {
+	      if (this.readyState == 4 && this.status == 200) {
+              let parsed = JSON.parse(this.responseText)['data'];
+              console.log(parsed);
+
+              slider.val((parseInt(parsed['brightness']*100)).toFixed(0));
+
+	      }
+	  }; 
+
+
+	  // We point the request at the appropriate command
+	  request.open("GET", "http://192.168.200.18:5000/get_brightness",  true);
+	  // and then we send it off
+	  request.send();
+	
+
+}
 
 drawStructure();
 

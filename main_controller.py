@@ -104,6 +104,12 @@ def set_brightness(b):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
+@app.route("/get_brightness")
+def get_brightness():
+    response = jsonify({"data": {"brightness": display.brightness}})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+
 @app.route("/get_hex_colors")
 def get_hex_colors():
     colors = {}
