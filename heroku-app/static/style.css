@@ -84,8 +84,8 @@ html, body{
 }
 
 .pcr-app{
-	width: 50vmin !important;
-	height: 60vmin !important;
+	width: 40vmin !important;
+	height: 50vmin !important;
 }
 
 .pcr-selection{ 
@@ -103,7 +103,7 @@ html, body{
 }
 
 .pcr-interaction * {
-	height: 8vmin !important;
+	height: 6vmin !important;
 	width: 10vmin !important;
 	font-size: 2.5vmin !important;
 }
