@@ -253,7 +253,7 @@ class SpotifyVisualizer:
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
         while self.should_run_visualizer:
-            if self.should_sync and self.track_info['is_playing']:
+            if self.should_sync and self.track_info is not None and self.track_info['is_playing']:
                     
                 curr = perf_counter()
                 #self.get_current_track()
