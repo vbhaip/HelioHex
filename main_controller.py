@@ -106,7 +106,7 @@ def set_brightness(b):
 
 @app.route("/get_brightness")
 def get_brightness():
-    response = jsonify({"data": {"brightness": display.brightness}})
+    response = jsonify({"data": {"brightness": display.get_brightness()}})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
