@@ -191,6 +191,8 @@ class Structure:
         #self.connect(self.hexagons[6], self.hexagons[7], 5)
         
 
+        self.path = settings.PATH
+
         self.process = Thread(target=self.update, args=())
         
         self.process.start()

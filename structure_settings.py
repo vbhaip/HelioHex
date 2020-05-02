@@ -19,3 +19,7 @@ CONNECTIONS = [(1,0,0),
                (4,6,3),
                (5,6,4),
                (6,7,4)]
+
+#the connecting side of hex a to hex b in the order the light goes
+#n-1 elements where n is number of hexagons
+PATH = [3, 2, 4, 2, 2, 4, 4] 
