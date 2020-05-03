@@ -169,7 +169,7 @@ class SpotifyVisualizer:
             except:
                 self.key = 7
 
-            self.refresh_rate = (60.0/analysis['track']['tempo'])/8.0
+            self.refresh_rate = (60.0/analysis['track']['tempo'])/4.0
             #self.refresh_rate = 0.05 
            
             time_vals = []
@@ -217,6 +217,22 @@ class SpotifyVisualizer:
         _, b_interp = self.interp(time_vals, pitch_vals[8:12], length=4)
         
         return(r_interp[0], g_interp[0], b_interp[0])
+
+    def get_rgb_interp_fxns2(self, pitch_vals):
+
+        pitch_vals = 300*(pitch_vals)
+
+        time_vals = [lc.HEX_COUNT*x/(12.0-1) for x in range(0, 12)]
+
+        _, rgb_interp = self.interp(time_vals, pitch_vals, length=12)
+
+        #print(time_vals)
+        #print(pitch_vals)
+        #print(rgb_interp)
+
+        return rgb_interp[0]
+    
+
    
     def get_color_from_rgb_interp(self, r, g, b, ind):
         r_val = 255-max(0, min(255, 100 + int(r(ind) - 200*(self.energy - 0.5 + self.valence))))
@@ -224,6 +240,24 @@ class SpotifyVisualizer:
         b_val = 255-max(0, min(255, 100 + int(b(ind) - 500*max(0, 0.5-self.valence))))
 
         return (r_val, g_val, b_val)
+
+    def set_display_pitch2(self, pitch_vals, uniform=False):
+        rgb = self.get_rgb_interp_fxns2(pitch_vals)
+
+        ind = self.key
+
+        threads = []
+        for i in range(0, lc.HEX_COUNT):
+            if uniform is False:
+                ind = i
+            hexagon = self.display.randomized_hexagons[i]
+            threads.append(Thread(target=hexagon.fade, args=(hexagon.color, hexagon.wheel(rgb(ind*(lc.HEX_COUNT-1)/lc.HEX_COUNT + 0.5)), 5, self.refresh_rate/2)))
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
 
     def set_display_pitch(self, pitch_vals, uniform=False):
         r, g, b = self.get_rgb_interp_fxns(pitch_vals)
@@ -283,9 +317,9 @@ class SpotifyVisualizer:
                 #t.start()
 
                 if(curr_loudness > 0.79):
-                    self.set_display_pitch(curr_pitch, uniform=True)
+                    self.set_display_pitch2(curr_pitch, uniform=True)
                 else:
-                    self.set_display_pitch(curr_pitch)
+                    self.set_display_pitch2(curr_pitch)
 
                 #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
                 sleep(self.refresh_rate)
