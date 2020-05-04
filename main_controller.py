@@ -126,6 +126,23 @@ def get_hex_colors():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
+@app.route("/set_color_palette")
+def set_color_palette():
+    cp = display.set_color_palette()
+    response = jsonify({"data": {"color_palette": cp}})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+
+
+@app.route("/set_color_palette/<string:hue>")
+@app.route("/set_color_palette/<float:hue>")
+@app.route("/set_color_palette/<int:hue>")
+def set_color_palette_hue(hue):
+    cp = display.set_color_palette(hue=hue)
+    response = jsonify({"data": {"color_palette": cp}})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+
 
 def main():
     print(app.url_map)

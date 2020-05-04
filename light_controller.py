@@ -7,7 +7,7 @@ from multiprocessing import Process
 import signal
 import sys
 import structure_settings as settings
-import seaborn as sns
+import randomcolor as rc
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -64,8 +64,8 @@ class Hexagon:
         return (((val-self.start)-6*self.offset)%36)+self.start
     
     def fix_color(self, color):
-        if max(color) <= 1:
-            color = tuple([255*x for x in color])
+        #if max(color) <= 1:
+        #    color = tuple([255*x for x in color])
 
         r = min(255, max(0, int(color[0])))
         g = min(255, max(0, int(color[1])))
@@ -381,17 +381,22 @@ class Structure:
             t.join()
 
 
-    def set_color_palette(self):
+    def set_color_palette(self, hue=None):
 
-        #sns.set_palette('hls', n_colors=8)
-        p = sns.color_palette(None, 8)
+        rand_color = rc.RandomColor()
         
-        print(p)
+        if hue is not None:
+            p = rand_color.generate(count=HEX_COUNT, format_='rgb', hue=hue)
+        else:
+            p = rand_color.generate(count=HEX_COUNT, format_='rgb')
+
+        p = [x[4:-1].split(",") for x in p]
+        p = [tuple(int(x) for x in y) for y in p]
+        
 
         self.set_color(p)
 
-
-        
+        return p
 
 
 def end_program(sig, frame):
