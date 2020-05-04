@@ -8,6 +8,9 @@ import signal
 import sys
 import structure_settings as settings
 import randomcolor as rc
+import datetime
+
+dt = datetime.datetime
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -36,9 +39,12 @@ class Hexagon:
     Creates a range from start_val inclusive to end_val not inclusive
     for pixels that would be controlled
     """
-    def __init__(self, start_val, end_val, offset = 0):
+    def __init__(self, start_val, end_val, parent, offset = 0):
         self.start = start_val
         self.end = end_val
+
+        #parent structure
+        self.parent = parent
 
         #lets me know what solid hexagon color it is rn
         self.color = None
@@ -176,7 +182,7 @@ class Hexagon:
 class Structure:
 
     def __init__(self):
-        self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX) for x in range(0, HEX_COUNT)]
+        self.hexagons = [Hexagon(LED_HEX*x, LED_HEX*x + LED_HEX, self) for x in range(0, HEX_COUNT)]
         
         self.randomized_hexagons = self.hexagons.copy()
         random.shuffle(self.randomized_hexagons)
@@ -336,6 +342,21 @@ class Structure:
                     self.set_color(new_color)
                     sleep(delay)
 
+    def fade_diff_hex(self, c1, c2, steps, delay):
+
+        if(self.continue_process):
+            threads = []
+
+            for i in range(0, HEX_COUNT):
+                threads.append(Thread(target=self.hexagons[i].fade, args=(c1[i], c2[i], steps, delay)))
+
+            for t in threads:
+                t.start()
+
+            for t in threads:
+                t.join()
+
+
     @_continue_process 
     def cycle_through_rainbow(self, repeat=False):
         self.fade(RAINBOW[len(RAINBOW) - 1], RAINBOW[0], 20, 2.5);
@@ -380,9 +401,7 @@ class Structure:
         for t in threads:
             t.join()
 
-
-    def set_color_palette(self, hue=None):
-
+    def get_color_palette(self, hue=None):
         rand_color = rc.RandomColor()
         
         if hue is not None:
@@ -392,11 +411,36 @@ class Structure:
 
         p = [x[4:-1].split(",") for x in p]
         p = [tuple(int(x) for x in y) for y in p]
-        
+
+        return p
+
+    def set_color_palette(self, hue=None):
+
+        p = self.get_color_palette(hue=hue) 
 
         self.set_color(p)
 
         return p
+
+    @_continue_process
+    def time_day_sync(self, repeat=False):
+
+        sunrise_hour = 6
+        sunset_hour = 8 
+        
+        curr_hour = dt.now().hour
+        next_hour = (curr_hour+1)%24
+
+        if(sunrise_hour <= next_hour < sunrise_hour):
+            color = 'purple'
+        else:
+            color = 'orange'
+       
+        #for fifteen it switches between diff colors
+        self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 900)
+        
+
+
 
 
 def end_program(sig, frame):

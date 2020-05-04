@@ -143,6 +143,15 @@ def set_color_palette_hue(hue):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
+@app.route("/day_time")
+@end_current_thread
+def day_time():
+    run_thread(Thread(target=display.time_day_sync, kwargs=REPEAT_KWARG))
+
+    response = jsonify({"data": "Synced to daytime"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+
 
 def main():
     print(app.url_map)
