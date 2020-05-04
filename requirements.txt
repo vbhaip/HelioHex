@@ -1,7 +1,8 @@
-spotipy==2.11.1
-scipy==1.1.0
-board==1.0
+scipy==1.4.1
+numpy==1.16.2
 Flask==1.0.2
+Adafruit_Blinka==4.3.0
+spotipy==2.11.1
 adafruit_circuitpython_neopixel==5.1.1
-numpy==1.15.0
-gunicorn==20.0.4
+board==1.0
+seaborn==0.10.1

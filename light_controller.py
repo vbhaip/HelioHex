@@ -7,7 +7,7 @@ from multiprocessing import Process
 import signal
 import sys
 import structure_settings as settings
-
+import seaborn as sns
 
 HEX_COUNT = 8 
 LED_HEX = 36
@@ -62,8 +62,18 @@ class Hexagon:
     
     def adjust_pixel_index(self, val):
         return (((val-self.start)-6*self.offset)%36)+self.start
+    
+    def fix_color(self, color):
+        if max(color) <= 1:
+            color = tuple([255*x for x in color])
+
+        r = min(255, max(0, int(color[0])))
+        g = min(255, max(0, int(color[1])))
+        b = min(255, max(0, int(color[2])))
+        return (r, g, b)
 
     def set_color(self, color, show=True):
+        color = self.fix_color(color)
         self.lock.acquire()
         for x in range(self.start, self.end):
             pixels[x] = color
@@ -280,23 +290,29 @@ class Structure:
             sleep(wait)
 
     def set_color(self, color):
-        
-
-        #threads = []
        
-        #using threads here doesn't seem to change it, there's still a little delay between hexs
-        for hexagon in self.hexagons:
-            hexagon.set_color(color, show=False)
-            #t = Thread(target=hexagon.set_color, args=(color, False))
-        #    threads.append(t)
+        #should be of length HEX_COUNT 
+        if isinstance(color, list):
+            for i in range(0, HEX_COUNT):
+                self.hexagons[i].set_color(color[i], show=False)
         
-        #for t in threads:
-        #    t.start()
+        else:
+            #threads = []
+           
+            #using threads here doesn't seem to change it, there's still a little delay between hexs
+            for hexagon in self.hexagons:
+                hexagon.set_color(color, show=False)
+                #t = Thread(target=hexagon.set_color, args=(color, False))
+            #    threads.append(t)
+            
+            #for t in threads:
+            #    t.start()
 
-        #for t in threads:
-        #    t.join()
+            #for t in threads:
+            #    t.join()
 
         pixels.show()
+
     
 
     #note: added self.continue process check here, so it will only run this in continuous circumstances
@@ -365,6 +381,19 @@ class Structure:
             t.join()
 
 
+    def set_color_palette(self):
+
+        #sns.set_palette('hls', n_colors=8)
+        p = sns.color_palette(None, 8)
+        
+        print(p)
+
+        self.set_color(p)
+
+
+        
+
+
 def end_program(sig, frame):
     for i in range(0, LED_HEX*HEX_COUNT):
         pixels[i] = BLACK
@@ -374,7 +403,11 @@ def end_program(sig, frame):
 def main():
     display = Structure()
     signal.signal(signal.SIGINT, end_program)
-    
+
+    while True:
+        display.set_color_palette()
+        sleep(2) 
+
     display.set_color(YELLOW)
     display.rainbow_light_in_order(.5)
 
