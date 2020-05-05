@@ -31,8 +31,7 @@ def run_thread(thread):
 
 @app.route("/")
 def index():
-    print("wassup")
-    return "hello"
+    return "Main Page"
 
 @app.route("/clear")
 @end_current_thread

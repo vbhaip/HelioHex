@@ -60,6 +60,9 @@ class SpotifyVisualizer:
 
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state user-modify-playback-state"
+
+        #token = spotipy.util.prompt_for_user_token(CREDENTIALS["SPOTIFY_USERNAME"], scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"])
+
         manager = spotipy.oauth2.SpotifyOAuth(username=CREDENTIALS["SPOTIFY_USERNAME"], scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"], cache_path="cached_spotify_token.txt")
 
         self.sp = spotipy.Spotify(oauth_manager=manager)
@@ -160,7 +163,7 @@ class SpotifyVisualizer:
             self.energy = features['energy']
             self.valence = features['valence']
             #print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
-
+            
             analysis = self.sp.audio_analysis(self.track)
             segments = analysis['segments']
             
@@ -286,6 +289,8 @@ class SpotifyVisualizer:
     def sync(self):
         temp_rainbow = lc.RAINBOW
         temp_rainbow.extend(lc.RAINBOW[0:4])
+
+        temp = 1
         while self.should_run_visualizer:
             if self.should_sync and self.track_info is not None and self.track_info['is_playing']:
                     
@@ -297,11 +302,19 @@ class SpotifyVisualizer:
                 curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
                 if VERBOSE:
                     print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
+
+
                 if(curr_loudness < 0.2):
                     curr_loudness = 0.2
                 elif(curr_loudness > .8):
                     curr_loudness = .8
+                
+                #if temp == 0:
+                #    curr_loudness = 1
 
+                #temp += 1
+                #temp = temp %4
+                
 
                 if self.pos > self.track_info['item']['duration_ms']/1000.0 - 1.0:
                     curr_loudness = (self.track_info['item']['duration_ms']/1000.0 - self.pos)  
@@ -316,10 +329,10 @@ class SpotifyVisualizer:
                 #t = Thread(target=self.set_display_pitch, args=([curr_pitch]))
                 #t.start()
 
-                if(curr_loudness > 0.79):
-                    self.set_display_pitch2(curr_pitch, uniform=True)
+                if(curr_loudness > .79):
+                    self.set_display_pitch(curr_pitch, uniform=True)
                 else:
-                    self.set_display_pitch2(curr_pitch)
+                    self.set_display_pitch(curr_pitch)
 
                 #self.display.set_color(temp_rainbow[np.argmax(curr_pitch)])
                 sleep(self.refresh_rate)
