@@ -215,7 +215,7 @@ function updatePath(){
 
 function resizeStructure(){
 	two.height = $(window).height()*.3;
-	two.width = $(window).width();
+    two.width = $('#drawing').width();
 	hexagons.translation.set(0,0);
 	hexagons.scale = 1;
 	hexagons.center();
