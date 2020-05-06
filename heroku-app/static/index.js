@@ -22,10 +22,10 @@ addEventListener("DOMContentLoaded", function() {
                 cache: false,
                 success: function(result){
                     enableInteractions();
-                    if(button.id != "flash_around" && button.id != "set_color_palette"){
+                    if(button.id != "flash_around" && button.id != "set_color_palette" && button.id != "day_time"){
                         clearVisualization();
                     }
-                    if(button.id == "set_color_palette"){
+                    if(button.id == "set_color_palette" || button.id == "day_time"){
                        getHexColors(); 
                     }
                 }

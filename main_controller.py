@@ -126,6 +126,7 @@ def get_hex_colors():
     return response 
 
 @app.route("/set_color_palette")
+@end_current_thread
 def set_color_palette():
     cp = display.set_color_palette()
     response = jsonify({"data": {"color_palette": cp}})
@@ -136,6 +137,7 @@ def set_color_palette():
 @app.route("/set_color_palette/<string:hue>")
 @app.route("/set_color_palette/<float:hue>")
 @app.route("/set_color_palette/<int:hue>")
+@end_current_thread
 def set_color_palette_hue(hue):
     cp = display.set_color_palette(hue=hue)
     response = jsonify({"data": {"color_palette": cp}})
