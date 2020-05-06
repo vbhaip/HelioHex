@@ -145,6 +145,7 @@ def set_color_palette_hue(hue):
 @app.route("/day_time")
 @end_current_thread
 def day_time():
+    display.first_time_day_sync()
     run_thread(Thread(target=display.time_day_sync, kwargs=REPEAT_KWARG))
 
     response = jsonify({"data": "Synced to daytime"})

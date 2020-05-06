@@ -423,6 +423,21 @@ class Structure:
 
         return p
 
+    def first_time_day_sync(self):
+        sunrise_hour = 6
+        sunset_hour = 20 
+        
+        curr_hour = dt.now().hour
+        next_hour = (curr_hour+1)%24
+
+        if(sunrise_hour <= next_hour < sunset_hour):
+            color = 'orange'
+        else:
+            color = 'blue'
+
+        self.set_color(self.get_color_palette(hue=color))
+       
+
     @_continue_process
     def time_day_sync(self, repeat=False):
 
@@ -435,7 +450,7 @@ class Structure:
         if(sunrise_hour <= next_hour < sunset_hour):
             color = 'orange'
         else:
-            color = 'purple'
+            color = 'blue'
        
         #for fifteen min it switches between diff colors
         self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 900)
