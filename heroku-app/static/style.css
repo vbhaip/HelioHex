@@ -18,7 +18,7 @@ html, body{
     margin: auto;
     margin-top: 4vh;
     height: 8vh;
-    width: 40vmin;
+    width: 30vmin;
     text-align: center;
     font-size: 2vmax;
     border-radius: 1vw;
@@ -28,8 +28,8 @@ html, body{
     outline: none;
     color: black;
 	display: inline-block;
-	margin-left: 30vmin;
-	margin-right: 30vmin;
+	margin-left: 2vmin;
+	margin-right: 2vmin;
 }
 
 .button:disabled { 

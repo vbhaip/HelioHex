@@ -22,8 +22,11 @@ addEventListener("DOMContentLoaded", function() {
                 cache: false,
                 success: function(result){
                     enableInteractions();
-                    if(button.id != "flash_around"){
+                    if(button.id != "flash_around" && button.id != "set_color_palette"){
                         clearVisualization();
+                    }
+                    if(button.id == "set_color_palette"){
+                       getHexColors(); 
                     }
                 }
             });
