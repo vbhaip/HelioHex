@@ -159,7 +159,7 @@ class Hexagon:
             sleep(wait)
     
     #Fades entire hex from color 1 to color 2
-    def fade(self, c1, c2, steps, delay):
+    def fade(self, c1, c2, steps, delay, check_parent_process = False):
         r_step = int((c2[0] - c1[0])/steps)
         g_step = int((c2[1] - c1[1])/steps)
         b_step = int((c2[2] - c1[2])/steps)
@@ -172,9 +172,10 @@ class Hexagon:
         sleep(delay)
 
         for x in range(0, steps):
-            new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
-            self.set_color(new_color, show=False)
-            sleep(delay)
+            if(check_parent_process and self.parent.continue_process):
+                new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
+                self.set_color(new_color, show=False)
+                sleep(delay)
 
     def __repr__(self):
        return str(self.start/(LED_HEX))
@@ -348,7 +349,7 @@ class Structure:
             threads = []
 
             for i in range(0, HEX_COUNT):
-                threads.append(Thread(target=self.hexagons[i].fade, args=(c1[i], c2[i], steps, delay)))
+                threads.append(Thread(target=self.hexagons[i].fade, args=(c1[i], c2[i], steps, delay), kwargs={'check_parent_process': True}))
 
             for t in threads:
                 t.start()
@@ -426,17 +427,17 @@ class Structure:
     def time_day_sync(self, repeat=False):
 
         sunrise_hour = 6
-        sunset_hour = 8 
+        sunset_hour = 20 
         
         curr_hour = dt.now().hour
         next_hour = (curr_hour+1)%24
 
-        if(sunrise_hour <= next_hour < sunrise_hour):
-            color = 'purple'
-        else:
+        if(sunrise_hour <= next_hour < sunset_hour):
             color = 'orange'
+        else:
+            color = 'purple'
        
-        #for fifteen it switches between diff colors
+        #for fifteen min it switches between diff colors
         self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 900)
         
 
