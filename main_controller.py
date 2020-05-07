@@ -4,6 +4,7 @@ import spotify_visualizer as sv
 from threading import Thread
 from functools import wraps
 from credentials import CREDENTIALS
+import pywemo 
 
 app = Flask(__name__)
 
@@ -13,6 +14,9 @@ display = visualizer.display
 REPEAT_KWARG = {'repeat': True}
 
 current_thread = [None]
+
+devices = pywemo.discover_devices()
+plug = devices[0]
 
 def end_current_thread(foo):
     @wraps(foo)
@@ -154,6 +158,24 @@ def day_time():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
+
+@app.route("/toggle_power")
+@end_current_thread
+def toggle_power():
+
+    plug.toggle()
+
+
+    response = jsonify({"data": {"is_on": plug.get_state()}})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
+    
+@app.route("plug_state")
+def plug_state():
+
+    response = jsonify({"data": {"is_on": plug.get_state()}})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response 
 
 def main():
     print(app.url_map)
