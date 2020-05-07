@@ -32,6 +32,7 @@ addEventListener("DOMContentLoaded", function() {
                     if(button.id == "toggle_power"){
                         if(result['data']['is_on'] == 1){
                             button.textContent = "Turn Off";
+                            getHexColors();
                         }
                         else{
                             button.textContent = "Turn On";
