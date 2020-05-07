@@ -28,6 +28,16 @@ addEventListener("DOMContentLoaded", function() {
                     if(button.id == "set_color_palette" || button.id == "day_time"){
                        getHexColors(); 
                     }
+
+                    if(button.id == "toggle_power"){
+                        if(result['data']['is_on'] == 1){
+                            button.textContent = "Turn Off";
+                        }
+                        else{
+                            button.textContent = "Turn On";
+                        }
+                    }
+
                 }
             });
         });

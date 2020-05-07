@@ -170,7 +170,7 @@ def toggle_power():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
     
-@app.route("plug_state")
+@app.route("/plug_state")
 def plug_state():
 
     response = jsonify({"data": {"is_on": plug.get_state()}})
