@@ -1,8 +1,9 @@
 //https://stackoverflow.com/questions/21566649/flask-button-run-python-without-refreshing-page
 // Only run what comes next *after* the page has loaded
 addEventListener("DOMContentLoaded", function() {
+   
+    getPlugState();
     
-
     let buttons = document.querySelectorAll(".basic_button");
     for (let i=0, l=buttons.length; i<l; i++) {
         let button = buttons[i];
@@ -44,6 +45,26 @@ addEventListener("DOMContentLoaded", function() {
         });
     }
 }, true);
+
+
+function getPlugState(){
+            $.ajax({
+                async: true,
+                url: "http://192.168.200.18:5000/plug_state",
+                cache: false,
+                success: function(result){
+                    console.log(result);
+                    if(result['data']['is_on'] == 1){
+                        $('#toggle_power')[0].textContent = "Turn Off"; 
+                    }
+                    else{
+                        clearVisualization();
+                        $('#toggle_power')[0].textContent = "Turn On"; 
+                    }
+                }
+            });
+
+}
 
 
 var slider = document.getElementById("slider");
