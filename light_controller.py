@@ -45,6 +45,7 @@ class Hexagon:
 
         #parent structure
         self.parent = parent
+        self.hex_val = int(self.start/(LED_HEX))
 
         #lets me know what solid hexagon color it is rn
         self.color = None
@@ -92,9 +93,10 @@ class Hexagon:
     Side value of 0 - 5, sets it all to one color
     """
     
-    def set_side_color(self, side, color, show=True):
+    def set_side_color(self, side, color, show=True, delay=0):
         for x in range(self.start+side*LED_HEX//6, self.start+(side+1)*LED_HEX//6):
             pixels[self.adjust_pixel_index(x)] = color
+            sleep(delay)
         if show:
             pixels.show()
 
@@ -178,7 +180,7 @@ class Hexagon:
                 sleep(delay)
 
     def __repr__(self):
-       return str(self.start/(LED_HEX))
+        return "Hexagon number: " + str(self.start/(LED_HEX))
 
 class Structure:
 
@@ -187,7 +189,7 @@ class Structure:
         
         self.randomized_hexagons = self.hexagons.copy()
         random.shuffle(self.randomized_hexagons)
-        print(self.randomized_hexagons)
+        #print(self.randomized_hexagons)
         
         for key in settings.OFFSETS:
             self.hexagons[key].offset = settings.OFFSETS[key]
@@ -454,7 +456,41 @@ class Structure:
        
         #for fifteen min it switches between diff colors
         self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 900)
+
+
+    def light_border(self, color):
+        for hexagon in self.hexagons:
+            print(hexagon.connections)
+            for i in range(0, 6):
+                if hexagon.connections[i] is None:
+                    hexagon.set_side_color(i, color, show = False)
+
+
+    def chase_perimeter(self, color):
+
+        curr_hex_ind = 0
+        curr_side = 1
         
+        curr_hex = self.hexagons[curr_hex_ind]
+        while curr_hex_ind is not 0 or curr_side is not 0:
+            if(curr_hex.connections[curr_side] is not None):
+                curr_hex_ind = curr_hex.connections[curr_side].hex_val
+                curr_side = (curr_side+3)%6
+                curr_side = (curr_side+1)%6
+                curr_hex = self.hexagons[curr_hex_ind]
+
+            curr_hex.set_side_color(curr_side, color, delay=0.15/6)
+            curr_side = (curr_side+1)%6
+
+            #sleep(0.15)
+    
+    @_continue_process
+    def rainbow_chase(self, repeat=False):
+        for color in RAINBOW:
+            if(self.continue_process):
+                self.chase_perimeter(color)
+
+
 
 
 
@@ -470,8 +506,9 @@ def main():
     signal.signal(signal.SIGINT, end_program)
 
     while True:
-        display.set_color_palette()
-        sleep(2) 
+        for a in RAINBOW:
+            display.chase_perimeter(a)
+            sleep(0) 
 
     display.set_color(YELLOW)
     display.rainbow_light_in_order(.5)

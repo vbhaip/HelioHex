@@ -15,8 +15,11 @@ REPEAT_KWARG = {'repeat': True}
 
 current_thread = [None]
 
-devices = pywemo.discover_devices()
-plug = devices[0]
+
+#devices = pywemo.discover_devices()
+#plug = devices[0]
+
+plug = pywemo.discovery.device_from_description(CREDENTIALS['WEMO_URL'], None)
 
 def end_current_thread(foo):
     @wraps(foo)
@@ -176,6 +179,17 @@ def plug_state():
     response = jsonify({"data": {"is_on": plug.get_state()}})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
+
+@app.route("/chase")
+@end_current_thread
+def chase():
+    display.clear()
+    run_thread(Thread(target=display.rainbow_chase, kwargs=REPEAT_KWARG))
+    response = jsonify({"data": "Chasing"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
 
 def main():
     print(app.url_map)
