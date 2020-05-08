@@ -174,7 +174,7 @@ class Hexagon:
         sleep(delay)
 
         for x in range(0, steps):
-            if(check_parent_process and self.parent.continue_process):
+            if(not check_parent_process or (check_parent_process and self.parent.continue_process)):
                 new_color = (new_color[0] + r_step, new_color[1] + g_step, new_color[2] + b_step) 
                 self.set_color(new_color, show=False)
                 sleep(delay)
@@ -378,6 +378,7 @@ class Structure:
             threads.append(t)
             
             sleep(random.uniform(wait/2.0, wait))
+
 
 
         for t in threads:
