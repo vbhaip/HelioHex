@@ -372,9 +372,7 @@ class Structure:
     def flash_around(self, wait, repeat=False):
         threads = []
         
-        hex_copy = self.hexagons
-        random.shuffle(hex_copy)
-        for hexagon in hex_copy: 
+        for hexagon in self.randomized_hexagons: 
             t = Thread(target=hexagon.fade, args=(hexagon.color, hexagon.get_deviant_color(50), 20, 2.5))
             t.start()
             threads.append(t)
