@@ -96,7 +96,7 @@ def set_hex_color(hex_num, rgb):
 @end_current_thread
 def flash_around():
 
-    run_thread(Thread(target=display.flash_around, args=[3], kwargs=REPEAT_KWARG))
+    run_thread(Thread(target=display.flash_around, args=[1], kwargs=REPEAT_KWARG))
 
     response = jsonify({"data": "Flashing around"})
     response.headers.add('Access-Control-Allow-Origin', '*')
