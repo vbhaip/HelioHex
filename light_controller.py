@@ -432,9 +432,9 @@ class Structure:
         next_hour = (curr_hour+1)%24
 
         if(sunrise_hour <= next_hour < sunset_hour):
-            color = 'orange'
+            color = 'orange' if random.random() > 0.5 else 'yellow'
         else:
-            color = 'blue'
+            color = 'blue' if random.random() > 0.5 else 'purple'
 
         self.set_color(self.get_color_palette(hue=color))
        
@@ -449,12 +449,12 @@ class Structure:
         next_hour = (curr_hour+1)%24
 
         if(sunrise_hour <= next_hour < sunset_hour):
-            color = 'orange'
+            color = 'orange' if random.random() > 0.5 else 'yellow'
         else:
-            color = 'blue'
+            color = 'blue' if random.random() > 0.5 else 'purple'
        
-        #for fifteen min it switches between diff colors
-        self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 900)
+        #for five min it switches between diff colors
+        self.fade_diff_hex([i.color for i in self.hexagons], self.get_color_palette(hue=color), 100, 300)
 
 
     def light_border(self, color):
