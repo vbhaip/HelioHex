@@ -14,9 +14,9 @@ from time import sleep, perf_counter, time
 from threading import Thread, Lock
 from datetime import datetime 
 import colorsys
+import random
 
-
-VERBOSE = False 
+VERBOSE = True 
 
 class SpotifyVisualizer:
     
@@ -49,6 +49,8 @@ class SpotifyVisualizer:
         self.key = None
 
         self.threads = []
+
+        self.curr_pitch = np.empty(12)
 
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state user-modify-playback-state"
@@ -190,6 +192,8 @@ class SpotifyVisualizer:
                 loudness_vals.append(segment['timbre'][0])
                 
                 pitch_norm = np.array(segment['pitches'])
+                #put more of a bias on higher values for pitch
+                pitch_norm = np.power(pitch_norm, 3)
                 pitch_norm = pitch_norm/np.sum(pitch_norm)
 
                 pitch_vals.append(pitch_norm)
@@ -258,13 +262,19 @@ class SpotifyVisualizer:
         #get value from 0 to 1 corresponding to the hue
         pitch = list(pitch)
         #print([i/12.0 for i in range(0, 12)])
-        hue = np.random.choice([i/12.0 for i in range(0, 12)], 1, pitch) 
+        hue = np.random.choice([i/12.0 for i in range(0, 12)], 1, p=pitch) 
+        #print(hue[0])
         return hue[0]
 
     def process_color(self, hue):
         light = 0.5
         satur = 1.0
+
+        energy_rng = 1/12.0 * random.uniform(0, self.energy)
+        hue += energy_rng
+
         raw_rgb = tuple([255*i for i in colorsys.hls_to_rgb(hue, light, satur)])
+
         return raw_rgb
 
     def display_pitch_on_prob(self, pos):
@@ -272,12 +282,20 @@ class SpotifyVisualizer:
         #set each hexagon to the color
         ind = self.get_location_index(self.time_vals, pos)
         curr_pitch = self.pitch_vals[ind]
-        print(curr_pitch)
+        #print(curr_pitch)
 
-        for hexagon in self.display.hexagons:
+        
+        #if(not (self.curr_pitch==curr_pitch).all()):
+        
+        hex_copy = self.display.hexagons.copy()
+        random.shuffle(hex_copy)
+        hex_copy = hex_copy[0:lc.HEX_COUNT//3]
+        for hexagon in hex_copy:
             hue = self.get_hue_from_pitch(curr_pitch)
             rgb = self.process_color(hue)
             hexagon.set_color(rgb, show=False)
+
+            #self.curr_pitch = curr_pitch
 
 
     def sync(self):
