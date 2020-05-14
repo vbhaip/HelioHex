@@ -15,8 +15,31 @@ from threading import Thread, Lock
 from datetime import datetime 
 import colorsys
 import random
+import itertools
 
-VERBOSE = True 
+VERBOSE = True
+
+#https://www.flutopedia.com/img/ColorOfSound_Nextdrum_lg.jpg
+#with C as index 0 and B as index 11
+KEY_TO_COLOR = [(40, 255, 0), (0,255,232), (0, 124, 255), (5, 0, 255), (69, 0, 234), (85, 0, 79), (116, 0, 0), (179, 0, 0), (238, 0, 0), (255, 99, 0), (255, 236, 0), (153, 255, 0)]
+
+MAJORS = set() 
+maj = [0,4,7]
+
+for i in range(0, 12):
+    MAJORS.add(tuple(sorted(maj)))
+
+    maj = [(a+1)%12 for a in maj]
+    
+
+MINORS = set() 
+mi = [0,3,7]
+
+for i in range(0, 12):
+    MINORS.add(tuple(sorted(mi)))
+
+    mi = [(a+1)%12 for a in mi]
+
 
 class SpotifyVisualizer:
     
@@ -202,11 +225,21 @@ class SpotifyVisualizer:
 
             #normalization for loudness vals from 0 to 1
             loudness_vals = np.array(loudness_vals)
-            loudness_vals = (loudness_vals - np.min(loudness_vals))/np.ptp(loudness_vals)
+
+            
+            #when normalizing don't look at beginning and end to give more dynamic range and avoid looking at outliers
+            adj_loud = loudness_vals[10:-10]
+            loudness_vals = (loudness_vals - np.min(adj_loud))/np.ptp(adj_loud)
+            
+            #make quiet sounds even quieter
+            loudness_vals[loudness_vals < 0] = 0
+            loudness_vals = np.power(loudness_vals, 2)
+            
+
             loudness_vals = loudness_vals
             self.loudness_vals = loudness_vals
 
-            self.time_vals, self.loudness_vals = self.interp(self.time_vals, self.loudness_vals)
+            #self.time_vals, self.loudness_vals = self.interp(self.time_vals, self.loudness_vals)
 
             
             
@@ -258,6 +291,35 @@ class SpotifyVisualizer:
         if uniform is True:
             sleep(self.refresh_rate*2)
 
+    def get_notes_played(self, pitch):
+        #pitch[pitch < 0.25] = 0
+
+        #threshold for determining if a note is "played"
+        played = np.argwhere(pitch > 1/12.0)
+        
+        #each element in played is in its own array so this reduces that dimension
+        return [i[0] for i in played]
+
+    def is_major(self, pitch): 
+        notes = self.get_notes_played(pitch)
+        for note_combo in itertools.combinations(notes, 3):
+            if tuple(note_combo) in MAJORS:
+                return True
+
+        return False
+
+        #return tuple(notes) in MAJORS
+
+
+    def is_minor(self, pitch):
+        notes = self.get_notes_played(pitch)
+        for note_combo in itertools.combinations(notes, 3):
+            if tuple(note_combo) in MINORS:
+                return True
+
+        return False
+
+
     def get_hue_from_pitch(self, pitch):
         #get value from 0 to 1 corresponding to the hue
         pitch = list(pitch)
@@ -265,10 +327,37 @@ class SpotifyVisualizer:
         hue = np.random.choice([i/12.0 for i in range(0, 12)], 1, p=pitch) 
         #print(hue[0])
         return hue[0]
+    
+    #this uses the key_to_color array
+    def get_rgb_from_pitch(self, pitch):
 
-    def process_color(self, hue):
+        pitch = list(pitch)
+        #print([i/12.0 for i in range(0, 12)])
+        rgb_ind = np.random.choice([i for i in range(0, 12)], 1, p=pitch) 
+        rgb_ind = int(rgb_ind)
+        #print(hue[0])
+        return KEY_TO_COLOR[rgb_ind] 
+    
+    def process_color_with_rgb(self, rgb):
+         
+        def energy_rng():
+            return 30 * random.uniform(-1*self.energy, self.energy)
+
+        rgb = tuple([i+energy_rng() for i in rgb])
+
+        return rgb
+
+    def process_color_with_hue(self, hue, pitch):
         light = 0.5
         satur = 1.0
+        
+        if self.is_major(pitch):
+            light = 1
+            print("major chord")
+
+        elif self.is_minor(pitch):
+            light = 0
+            print("minor chord")
 
         energy_rng = 1/12.0 * random.uniform(0, self.energy)
         hue += energy_rng
@@ -292,7 +381,10 @@ class SpotifyVisualizer:
         hex_copy = hex_copy[0:lc.HEX_COUNT//3]
         for hexagon in hex_copy:
             hue = self.get_hue_from_pitch(curr_pitch)
-            rgb = self.process_color(hue)
+            rgb = self.process_color_with_hue(hue, curr_pitch)
+
+            #rgb = self.get_rgb_from_pitch(curr_pitch)
+            #rgb = self.process_color_with_rgb(rgb)
             hexagon.set_color(rgb, show=False)
 
             #self.curr_pitch = curr_pitch
@@ -311,7 +403,10 @@ class SpotifyVisualizer:
                 #self.pos += (perf_counter() - curr)
                 #print(len(self.time_vals))
                 #print(len(self.loudness_vals))
-                curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
+
+                #curr_loudness = self.get_value_from_interp(self.pos, self.time_vals, self.loudness_vals)
+
+                curr_loudness = self.loudness_vals[self.get_location_index(self.time_vals, self.pos)]
                 if VERBOSE:
                     print("Pos: " + str(self.pos) + " Loudness: " + str(curr_loudness))
                 
