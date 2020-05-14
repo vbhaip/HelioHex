@@ -41,6 +41,9 @@ for i in range(0, 12):
     mi = [(a+1)%12 for a in mi]
 
 
+#how many times we sample in the tempo - if the tempo is 30 bpm, we'd sample 30*SAMPLE_FACTOR times in a minute
+SAMPLE_FACTOR = 4
+
 class SpotifyVisualizer:
     
     def __init__(self):
@@ -194,7 +197,12 @@ class SpotifyVisualizer:
             except:
                 self.key = 7
 
-            self.refresh_rate = (60.0/analysis['track']['tempo'])/4.0
+            self.bpm = analysis['track']['tempo']
+            self.bpm = min(self.bpm, 120)
+            print(self.bpm)
+            self.refresh_rate = (60.0/self.bpm)/SAMPLE_FACTOR
+
+
             #self.refresh_rate = 0.05 
            
             time_vals = []
@@ -319,6 +327,10 @@ class SpotifyVisualizer:
 
         return False
 
+    def sustained_note(self, rgb, seg_len):
+        for hexagon in self.display.hexagons:
+            hexagon.set_color(rgb)
+            sleep(seg_len/lc.HEX_COUNT)
 
     def get_hue_from_pitch(self, pitch):
         #get value from 0 to 1 corresponding to the hue
@@ -326,7 +338,7 @@ class SpotifyVisualizer:
         #print([i/12.0 for i in range(0, 12)])
         hue = np.random.choice([i/12.0 for i in range(0, 12)], 1, p=pitch) 
         #print(hue[0])
-        return hue[0]
+        return (hue[0]+0.33)%1
     
     #this uses the key_to_color array
     def get_rgb_from_pitch(self, pitch):
@@ -366,28 +378,46 @@ class SpotifyVisualizer:
 
         return raw_rgb
 
-    def display_pitch_on_prob(self, pos):
+    def emotion_bias_rgb(self, rgb):
+        
+        #if its a sad song, the hexagon should have a chance of tinting more blue
+        if(self.valence < 0.5 and random.random() > self.valence):
+            rgb = (rgb[0] - 255*random.random(), rgb[1] - 255*random.random(), rgb[2] + 255*random.random())
+
+        return rgb
+
+    def display_pitch_on_prob(self, pos, loud):
         #sample value to get container
         #set each hexagon to the color
         ind = self.get_location_index(self.time_vals, pos)
         curr_pitch = self.pitch_vals[ind]
         #print(curr_pitch)
 
+        hex_change_factor = 3 
+        if(not (self.curr_pitch==curr_pitch).all()):
+            hex_change_factor = 1
+
+            self.curr_pitch = curr_pitch
         
-        #if(not (self.curr_pitch==curr_pitch).all()):
-        
+        segment_length = self.time_vals[min(len(self.time_vals)-1, ind+1)] - self.time_vals[ind]
+        print(segment_length)
+        if(segment_length > .5 and loud > 0.9):
+            hue = self.get_hue_from_pitch(curr_pitch)
+            rgb = self.process_color_with_hue(hue, curr_pitch)
+            rgb = self.emotion_bias_rgb(rgb)
+            self.sustained_note(rgb, segment_length)
+            
         hex_copy = self.display.hexagons.copy()
         random.shuffle(hex_copy)
-        hex_copy = hex_copy[0:lc.HEX_COUNT//3]
+        hex_copy = hex_copy[0:lc.HEX_COUNT//hex_change_factor]
         for hexagon in hex_copy:
             hue = self.get_hue_from_pitch(curr_pitch)
             rgb = self.process_color_with_hue(hue, curr_pitch)
+            rgb = self.emotion_bias_rgb(rgb)
 
             #rgb = self.get_rgb_from_pitch(curr_pitch)
             #rgb = self.process_color_with_rgb(rgb)
             hexagon.set_color(rgb, show=False)
-
-            #self.curr_pitch = curr_pitch
 
 
     def sync(self):
@@ -417,7 +447,7 @@ class SpotifyVisualizer:
                 self.display.set_brightness(curr_loudness)
                 
                 
-                self.display_pitch_on_prob(self.pos)
+                self.display_pitch_on_prob(self.pos, curr_loudness)
 
                 #curr_pitch = []
                 #for i in range(0, 12):
