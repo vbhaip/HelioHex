@@ -64,6 +64,7 @@ html, body{
   display: inline-block;
   margin: auto;
   margin-top: 4vh;
+  border-radius: 0.5vw;
 }
 
 /* Mouse-over effects */
@@ -84,6 +85,7 @@ html, body{
   height: 8vh; /* Slider handle height */
   background: #F79824;
   cursor: pointer; /* Cursor on hover */
+  border-radius: 0.5vw;
 }
 
 .slider::-moz-range-thumb {
@@ -91,6 +93,7 @@ html, body{
   height: 8vh; /* Slider handle height */
   background: #F79824;
   cursor: pointer; /* Cursor on hover */
+  border-radius: 0.5vw;
 }
 
 .pcr-app{

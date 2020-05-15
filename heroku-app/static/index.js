@@ -308,6 +308,7 @@ function drawStructure(){
 	attachHexagonClickEvents();
     getHexColors();
     getBrightnessSlider();
+	//animateStructureShowing();
 
 
 }
@@ -379,8 +380,27 @@ function enableInteractions(){
     slider.disabled = false;
 }
 
+function animateStructureShowing(){
+	let orig_scale = hexagons.scale;
+	hexagons.scale = 0;	
+	for(let i = 0; i < 60; i++){
+		setTimeout(function(){
+			for(let j = 0; j < hexagons.children.length; j++){
+				let hexagon = hexagons.children[j];
+				console.log(hexagon);
+				hexagon.rotation = hexagon.rotation +  2 * Math.PI / 60;
+			}
+			hexagons.scale += orig_scale / 60;
+			//resizeStructure();
+			two.update();
+			console.log(i);
+		}, 20*i);
+
+	}
+}
 
 drawStructure();
+animateStructureShowing();
 
 window.addEventListener('resize', resizeStructure, true);
 
