@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import light_controller as lc
-import spotify_visualizer as sv
+import spotify_visualizer_v2 as sv
 from threading import Thread
 from functools import wraps
 from credentials import CREDENTIALS
