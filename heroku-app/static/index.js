@@ -53,8 +53,9 @@ function getPlugState(){
                 url: "http://192.168.200.18:5000/plug_state",
                 cache: false,
                 success: function(result){
-                    console.log(result);
+                    //console.log(result);
                     if(result['data']['is_on'] == 1){
+						getHexColors();
                         $('#toggle_power')[0].textContent = "Turn Off"; 
                     }
                     else{
@@ -172,7 +173,7 @@ function makePickr(id, endpoint){
 	});
 
 	pickr.on('save', (color, instance) => {
-		console.log(color.toRGBA());
+		//console.log(color.toRGBA());
 		new_color = color.toRGBA();
 		
 		new_color.pop();
@@ -259,7 +260,7 @@ function resizeStructure(){
 
 	//This adjusts the hexagons to fit into the canvas no matter what
 	hexagons.scale = Math.min(two.height/bound_h, two.width/bound_w);
-	two.update();
+	//two.update();
 
 }
 
@@ -304,11 +305,11 @@ function drawStructure(){
 		//console.log("___");
 		makeHex(x, y, r);
 	}
-	resizeStructure();
-	attachHexagonClickEvents();
-    getHexColors();
     getBrightnessSlider();
-	//animateStructureShowing();
+	resizeStructure();
+	two.update();
+	attachHexagonClickEvents();
+	animateStructureShowing();
 
 
 }
@@ -316,7 +317,7 @@ function drawStructure(){
 function getHexColors(){
     
     $.ajax({
-        async: false,
+        async: true,
         url: "http://192.168.200.18:5000/get_hex_colors",
         cache: false,
         success: function(result){
@@ -387,20 +388,27 @@ function animateStructureShowing(){
 		setTimeout(function(){
 			for(let j = 0; j < hexagons.children.length; j++){
 				let hexagon = hexagons.children[j];
-				console.log(hexagon);
+				//console.log(hexagon);
 				hexagon.rotation = hexagon.rotation +  2 * Math.PI / 60;
 			}
 			hexagons.scale += orig_scale / 60;
 			//resizeStructure();
 			two.update();
-			console.log(i);
-		}, 20*i);
+			//console.log(i);
+
+
+		}, 40*i);
 
 	}
 }
+setTimeout(function(){
+	getHexColors();
+	drawStructure();
+	animateStructureShowing();
+}, 300);
 
-drawStructure();
-animateStructureShowing();
-
-window.addEventListener('resize', resizeStructure, true);
+window.addEventListener('resize', () => {
+	resizeStructure();
+	two.update();
+}, true);
 
