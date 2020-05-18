@@ -71,6 +71,7 @@ This is a simplified diagram, but should give you an idea for how it works.
 | [spotify_visualizer.py](spotify_visualizer.py) | Contains SpotifyVisualizer class that syncs the display to pitch and loudness information on the song currently playing on Spotify. The visualization uses functions to interpolate pitch and loudness over time and samples from it. |
 | [spotify_visualizer_v2.py](spotify_visualizer_v2.py) | Updated version of [spotify_visualizer.py](spotify_visualizer.py). Uses a probabilistic sampling from pitch and loudness data and includes improvements to reflect emotions in song. |
 | [Spotify Analysis Testing.xlsx](<Spotify Analysis Testing.xlsx>) | Analysis of data from Spotify, containing visualizations to better understand data. |
+| [Project Diagram.afdesign](<Project Diagram.afdesign>) | Diagram for how everything connects (shown on the README)|
 | [clear.py](clear.py) | Short script to turn off all the lights - used when testing. |
 | [images/](images/) | Contains images used in README. |
 | [heroku-app/](heroku-app/) | Contains Flask server to act as a web controller for the display. Pushed onto heroku server to be accessible from any device on http://heliohex.herokuapp.com. |
