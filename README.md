@@ -7,6 +7,7 @@ This repository contains my work for a dynamic LED lighting display project.
 
 [![Youtube Demo](https://img.youtube.com/vi/GV5ejh_CZBM/0.jpg)](https://youtu.be/GV5ejh_CZBM)
 
+^ Click on the image to watch the Youtube video and see it in action!
 
 ## Features
 
