@@ -3,3 +3,4 @@ __pycache__
 cached_spotify_token.txt
 *.swp
 *.pem
+.DS_Store
