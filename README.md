@@ -34,6 +34,8 @@ This is how the structure display looks without the light diffusing sheets on to
 <img src="images/individual-hexagon.jpg" width="200" height="200">
 This is a closer look of each individual hexagon. Each hexagon consists of wood pieces I cut out and glued together. A piece of an individual addressable LED strip is attached to the inner perimeter of each hexagon. At the end of these LED strips are the soldered connections. The wood planks have notches at the bottom of each side for connecting pieces of wire to pass through. The small blue and red wires at the top right connect the ground and 5V wires of the ends of the LED strip together to ensure thatthere is sufficient power that can pass to the entire display.
 
+Acrylic sheets diffuse the light from the LED strips. For now, I used parchment paper since I don't have access to a laser cutter to cut out the acrylic sheet (acrylic is very brittle and cracked each time I cut it).
+
 
 ### Materials and Costs 
 
@@ -56,9 +58,9 @@ This is a closer look of each individual hexagon. Each hexagon consists of wood 
 | -- | -- |
 | [main_controller.py](main_controller.py) | Runs a local flask server that is on the Raspberry Pi. Endpoints control lighting modes of the display and return information on current display state. |
 | [light_controller.py](light_controller.py) | Holds the Hexagon class and Structure class for the low level controlling of lighting modes. |
-| [structure_settings.py](structure_settings.py) | Configurations file for the display. light_controller.py reads from this file to determine the pattern of the display. |
+| [structure_settings.py](structure_settings.py) | Configurations file for the display. [light_controller.py](light_controller.py) reads from this file to determine the pattern of the display. |
 | [spotify_visualizer.py](spotify_visualizer.py) | Contains SpotifyVisualizer class that syncs the display to pitch and loudness information on the song currently playing on Spotify. The visualization uses functions to interpolate pitch and loudness over time and samples from it. |
-| [spotify_visualizer_v2.py](spotify_visualizer_v2.py) | Updated version of spotify_visualizer.py. Uses a probabilistic sampling from pitch and loudness data and includes improvements to reflect emotions in song. |
+| [spotify_visualizer_v2.py](spotify_visualizer_v2.py) | Updated version of [spotify_visualizer.py](spotify_visualizer.py). Uses a probabilistic sampling from pitch and loudness data and includes improvements to reflect emotions in song. |
 | [Spotify Analysis Testing.xlsx](<Spotify Analysis Testing.xlsx>) | Analysis of data from Spotify, containing visualizations to better understand data. |
 | [clear.py](clear.py) | Short script to turn off all the lights - used when testing. |
 | [images/](images/) | Contains images used in README. |
