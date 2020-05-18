@@ -34,6 +34,7 @@ This is how the structure display looks without the light diffusing sheets on to
 <img src="images/individual-hexagon.jpg" width="200" height="200">
 This is a closer look of each individual hexagon. Each hexagon consists of wood pieces I cut out and glued together. A piece of an individual addressable LED strip is attached to the inner perimeter of each hexagon. At the end of these LED strips are the soldered connections. The wood planks have notches at the bottom of each side for connecting pieces of wire to pass through. The small blue and red wires at the top right connect the ground and 5V wires of the ends of the LED strip together to ensure thatthere is sufficient power that can pass to the entire display.
 
+
 Acrylic sheets diffuse the light from the LED strips. For now, I used parchment paper since I don't have access to a laser cutter to cut out the acrylic sheet (acrylic is very brittle and cracked each time I cut it).
 
 
@@ -50,6 +51,13 @@ Acrylic sheets diffuse the light from the LED strips. For now, I used parchment 
 | 40 Amp Power Supply | https://www.amazon.com/CHINLY-Universal-Regulated-Switching-Transformer/dp/B01LZRIWZD/ref=sr_1_4 | $20.99 |
 | Hot glue, super glue, push pins, clamps, etc. | - | $30.00 |
 | **Total** | - | **$159.77** |
+
+
+### How does it work? 
+
+<img src="images/diagram.png" width="600" height="300">
+
+This is a simplified diagram, but should give you an idea of how it works.
 
 
 ### Code
