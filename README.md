@@ -27,9 +27,9 @@ This repository contains my work for a dynamic LED lighting display project.
 
 ### Under the Hood
 
-![](images/structure-no-cover.jpg =200x)
+![](images/structure-no-cover.jpg =200x200)
 This is how the structure display looks without the light diffusing sheets on top. Each hexagon has a JST connector so that it can connect to any hexagon in whatever way you want to plug them in. 
 
 
-![](images/individual-hexagon.jpg =200x)
+![](images/individual-hexagon.jpg =200x200)
 This is a closer look of each individual hexagon. Each hexagon consists of wood pieces I cut out and glued together. A piece of an individual addressable LED strip is attached to the inner perimeter of each hexagon. At the end of these LED strips are the soldered connections. The wood planks have notches at the bottom of each side for connecting pieces of wire to pass through. The small blue and red wires at the top right connect the ground and 5V wires of the ends of the LED strip together to ensure thatthere is sufficient power that can pass to the entire display.
