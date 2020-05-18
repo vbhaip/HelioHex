@@ -27,7 +27,7 @@ This repository contains my work for a dynamic LED lighting display project.
 
 ### Under the Hood
 
-<img src="images/structure-no-cover.jpg" width="200" height="200">
+<img src="images/structure-no-cover.jpg" width="275" height="200">
 This is how the structure display looks without the light diffusing sheets on top. Each hexagon has a JST connector so that it can connect to any hexagon in whatever way you want to plug them in. 
 
 
