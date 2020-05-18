@@ -32,7 +32,7 @@ This is how the structure display looks without the light diffusing sheets on to
 
 
 <img src="images/individual-hexagon.jpg" width="200" height="200">
-This is a closer look of each individual hexagon. Each hexagon consists of wood pieces I cut out and glued together. A piece of an individual addressable LED strip is attached to the inner perimeter of each hexagon. At the end of these LED strips are the soldered connections. The wood planks have notches at the bottom of each side for connecting pieces of wire to pass through. The small blue and red wires at the top right connect the ground and 5V wires of the ends of the LED strip together to ensure thatthere is sufficient power that can pass to the entire display.
+This is a closer look at each individual hexagon. Each hexagon consists of wood pieces I cut out and glued together. A piece of an individual addressable LED strip is attached to the inner perimeter of each hexagon. At the end of these LED strips are the connectors to link to other hexagons. The wood planks have notches at the bottom of each side for connecting the wires of each hexagon. The small blue and red wires at the top right connect the ground and 5V wires of the ends of the LED strip together to ensure that there is sufficient power that can pass to the entire display. Each hexagon is independent from the others in the way that I can make another hexagon and easily attach it to the display without changing the other hexagons.
 
 <br/><br/>
 
@@ -68,14 +68,14 @@ This is a simplified diagram, but should give you an idea for how it works.
 | [main_controller.py](main_controller.py) | Runs a local Flask server that is on the Raspberry Pi. Endpoints control lighting modes of the display and return information on current display state. |
 | [light_controller.py](light_controller.py) | Holds the Hexagon class and Structure class for the low level controlling of lighting modes. |
 | [structure_settings.py](structure_settings.py) | Configurations file for the display. [light_controller.py](light_controller.py) reads from this file to determine the pattern of the display. |
-| [spotify_visualizer.py](spotify_visualizer.py) | Contains SpotifyVisualizer class that syncs the display to pitch and loudness information on the song currently playing on Spotify. The visualization uses functions to interpolate pitch and loudness over time and samples from it. |
-| [spotify_visualizer_v2.py](spotify_visualizer_v2.py) | Updated version of [spotify_visualizer.py](spotify_visualizer.py). Uses a probabilistic sampling from pitch and loudness data and includes improvements to reflect emotions in song. |
-| [Spotify Analysis Testing.xlsx](<Spotify Analysis Testing.xlsx>) | Analysis of data from Spotify, containing visualizations to better understand data. |
-| [Project Diagram.afdesign](<Project Diagram.afdesign>) | Diagram for how everything connects (shown on the README)|
+| [spotify_visualizer.py](spotify_visualizer.py) | Contains the SpotifyVisualizer class that syncs the display to pitch and loudness information on the song currently playing on Spotify. The visualization uses functions to interpolate pitch and loudness over time and samples from it. |
+| [spotify_visualizer_v2.py](spotify_visualizer_v2.py) | Updated version of [spotify_visualizer.py](spotify_visualizer.py). Uses a probabilistic sampling from pitch and loudness data and includes improvements to reflect emotions in the song. |
+| [Spotify Analysis Testing.xlsx](<Spotify Analysis Testing.xlsx>) | Analysis of data from Spotify, containing graphs I created to better understand the data. |
+| [Project Diagram.afdesign](<Project Diagram.afdesign>) | Diagram for how everything works on a high-level (shown in the README)|
 | [clear.py](clear.py) | Short script to turn off all the lights - used when testing. |
-| [images/](images/) | Contains images used in README. |
-| [heroku-app/](heroku-app/) | Contains Flask server to act as a web controller for the display. Pushed onto heroku server to be accessible from any device on http://heliohex.herokuapp.com. |
-| [heroku-app/app.py](heroku-app/app.py) | Serves Flask server to serve webpage. |
+| [images/](images/) | Contains images used in the README. |
+| [heroku-app/](heroku-app/) | Contains Flask server that acts as a web controller for the display. Hosted on a Heroku server to be accessible from any device at http://heliohex.herokuapp.com. (You can access this website, but it will only work when you are on the network.) |
+| [heroku-app/app.py](heroku-app/app.py) | Serves Flask server for the webpage. |
 | [heroku-app/Controller Mockup.afdesign](<heroku-app/Controller Mockup.afdesign>) | Mockup of web controller in Affinity Designer. |
 | [heroku-app/templates/index.html](heroku-app/templates/index.html) | Webpage for web controller. |
 | [heroku-app/static](heroku-app/static) | Javascript and CSS for web controller. |
