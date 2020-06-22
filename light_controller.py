@@ -471,7 +471,7 @@ class Structure:
         curr_side = 1
         
         curr_hex = self.hexagons[curr_hex_ind]
-        while curr_hex_ind is not 0 or curr_side is not 0:
+        while not (curr_hex_ind is 0 and curr_side is 0):
             if(curr_hex.connections[curr_side] is not None):
                 curr_hex_ind = curr_hex.connections[curr_side].hex_val
                 curr_side = (curr_side+3)%6

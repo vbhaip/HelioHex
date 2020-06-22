@@ -52,7 +52,8 @@ class SpotifyVisualizer:
         self.track = None
         self.pos = None
         self.display = lc.Structure()
-        self.display.set_color(lc.RED)
+
+        self.display.set_color_palette()
 
         self.time_vals = None
         self.loudness_vals = None
