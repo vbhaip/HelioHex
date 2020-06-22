@@ -229,7 +229,8 @@ function makeHex(x, y, r){
 	hexagons.add(hex);
 }
 
-let path = []
+//hardcoded path just to alleviate time if it doesnt load
+let path = [3,3,1,3,3,2,5]
 
 function updatePath(){
       
@@ -318,7 +319,7 @@ function getHexColors(){
     
     $.ajax({
         async: true,
-        url: "http://192.168.200.18:5000/get_hex_colors",
+        url: "http://192.168.200.28:5000/get_hex_colors",
         cache: false,
         success: function(result){
             for(let i = 0; i < hexagons.children.length; i++){
@@ -334,7 +335,7 @@ function getBrightnessSlider(){
     
     $.ajax({
         async: false,
-        url: "http://192.168.200.18:5000/get_brightness",
+        url: "http://192.168.200.28:5000/get_brightness",
         cache: false,
         success: function(result){
             slider.value = ((parseInt(result['data']['brightness']*100)).toFixed(0));
