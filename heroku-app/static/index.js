@@ -19,7 +19,7 @@ addEventListener("DOMContentLoaded", function() {
             disableInteractions();
             $.ajax({
                 async: true,
-                url: "http://192.168.200.18:5000/" + command,
+                url: "http://192.168.200.28:5000/" + command,
                 cache: false,
                 success: function(result){
                     enableInteractions();
@@ -50,7 +50,7 @@ addEventListener("DOMContentLoaded", function() {
 function getPlugState(){
             $.ajax({
                 async: true,
-                url: "http://192.168.200.18:5000/plug_state",
+                url: "http://192.168.200.28:5000/plug_state",
                 cache: false,
                 success: function(result){
                     //console.log(result);
@@ -74,7 +74,7 @@ slider.onchange = function(){
     disableInteractions();
     $.ajax({
         async: false,
-        url: "http://192.168.200.18:5000/set_brightness/" + slider.value/100.0,
+        url: "http://192.168.200.28:5000/set_brightness/" + slider.value/100.0,
         cache: false,
         success: function(result){
             enableInteractions();
@@ -196,7 +196,7 @@ function makePickr(id, endpoint){
           disableInteractions();
           $.ajax({
               async: true,
-              url: "http://192.168.200.18:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
+              url: "http://192.168.200.28:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
               cache: false,
               success: function(result){
                   enableInteractions();
@@ -235,7 +235,7 @@ function updatePath(){
       
     $.ajax({
         async: false,
-        url: "http://192.168.200.18:5000/get_path",
+        url: "http://192.168.200.28:5000/get_path",
         cache: false,
         success: function(result){
             path = result['data']['path'];
