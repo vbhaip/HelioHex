@@ -230,7 +230,7 @@ function makeHex(x, y, r){
 }
 
 //hardcoded path just to alleviate time if it doesnt load
-let path = [3,3,1,3,3,2,5]
+let path = [3,3,1,3,3,2,4]
 
 function updatePath(){
       

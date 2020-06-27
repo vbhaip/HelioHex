@@ -77,4 +77,4 @@ CONNECTIONS = [(1,0,0),
 
 #the connecting side of hex a to hex b in the order the light goes
 #n-1 elements where n is number of hexagons
-PATH = [3, 3, 1, 3, 3, 2, 5] 
+PATH = [3, 3, 1, 3, 3, 2, 4] 
