@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, request, jsonify
 import light_controller as lc
 import spotify_visualizer_v2 as sv

@@ -82,7 +82,9 @@ class SpotifyVisualizer:
     def authenticate(self):
         scope = "user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state user-modify-playback-state"
 
-        #token = spotipy.util.prompt_for_user_token(CREDENTIALS["SPOTIFY_USERNAME"], scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"])
+
+        #i should hypothetically uncomment the line below but it still works regardless so imma leave it as is
+        token = spotipy.util.prompt_for_user_token(CREDENTIALS["SPOTIFY_USERNAME"], scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"])
 
         manager = spotipy.oauth2.SpotifyOAuth(username=CREDENTIALS["SPOTIFY_USERNAME"], scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"], cache_path="cached_spotify_token.txt")
 
@@ -134,33 +136,38 @@ class SpotifyVisualizer:
         return ind
     
     def get_current_track(self):
-        curr = perf_counter()
-        #self.track_info = self.sp.current_user_playing_track()
-        self.track_info = self.sp.current_playback()
-        if(self.track_info != None):
+        try:
+            curr = perf_counter()
+            #self.track_info = self.sp.current_user_playing_track()
+            self.track_info = self.sp.current_playback()
+            if(self.track_info != None):
 
-            temp_track = self.track_info['item']['uri']
-            if self.track is None: 
-                self.track = temp_track 
-                self.get_track_analysis()
-                self.should_sync = True
-                self.should_update_playback = True
+                temp_track = self.track_info['item']['uri']
+                if self.track is None: 
+                    self.track = temp_track 
+                    self.get_track_analysis()
+                    self.should_sync = True
+                    self.should_update_playback = True
 
-            #this deals with if we switch songs
-            elif self.track != temp_track:
-                self.should_sync = False
-                self.should_refresh = False
-                self.should_update_playback = False
-                self.track = temp_track
-                self.get_track_analysis()
-                self.should_sync = True
-                self.should_refresh = True
-                self.should_update_playback = True
+                #this deals with if we switch songs
+                elif self.track != temp_track:
+                    self.should_sync = False
+                    self.should_refresh = False
+                    self.should_update_playback = False
+                    self.track = temp_track
+                    self.get_track_analysis()
+                    self.should_sync = True
+                    self.should_refresh = True
+                    self.should_update_playback = True
 
-            #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
-            self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
-        else:
-            print("Please play a song to start.\n")
+                #arbitrarily subtract 0.5 seconds bc spotify's playback is off usually, and 0.5 seconds seems like an average amount
+                self.update_pos((self.track_info['progress_ms'])/1000 - 1 + perf_counter() - curr)
+            else:
+                print("Please play a song to start.\n")
+        except:
+            print("Could not get current track")
+            self.stop()
+
 
     def continuous_refresh_spotify_data(self):
         while self.should_run_visualizer: 
@@ -180,80 +187,84 @@ class SpotifyVisualizer:
                        sleep(2)
 
     def get_track_analysis(self):
-        if self.track is not None:
-            #self.show(self.sp.audio_analysis(self.track)['segments'][0:2])
-           
-            features = self.sp.audio_features(self.track)[0]
-            
-            self.acoustic = features['acousticness']
-            self.energy = features['energy']
-            self.valence = features['valence']
-            #print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
-            
-            analysis = self.sp.audio_analysis(self.track)
-            segments = analysis['segments']
-            
-            try:
-                self.key = analysis['sections'][0]['key']
-            except:
-                self.key = 7
-
-            self.bpm = analysis['track']['tempo']
-            self.bpm = min(self.bpm, 120)
-            print(self.bpm)
-            self.refresh_rate = (60.0/self.bpm)/SAMPLE_FACTOR
-
-
-            #self.refresh_rate = 0.05 
-           
-            time_vals = []
-            loudness_vals = []
-            pitch_vals = []
-            for segment in segments:
-                if 'start' not in segment:
-                    time_vals.append(0.0)
-                else:
-                    time_vals.append(segment['start'])
-
-                if 'loudness_start' not in segment:
-                    segment['loudness_start'] = -30.0
-                if 'loudness_max' not in segment:
-                    segment['loudness_max'] = segment['loudness_start']
+        try:
+            if self.track is not None:
+                #self.show(self.sp.audio_analysis(self.track)['segments'][0:2])
                
-                #look to average loudness based off timbre 
-                loudness_vals.append(segment['timbre'][0])
+                features = self.sp.audio_features(self.track)[0]
                 
-                pitch_norm = np.array(segment['pitches'])
-                #put more of a bias on higher values for pitch
-                pitch_norm = np.power(pitch_norm, 3)
-                pitch_norm = pitch_norm/np.sum(pitch_norm)
+                self.acoustic = features['acousticness']
+                self.energy = features['energy']
+                self.valence = features['valence']
+                #print(self.track_info['item']['name'] + "\t acoust\t" + str(features['acousticness']) + " energy\t" + str(features['energy']) + " liveness\t" + str(features['liveness']) + " valence\t" + str(features['valence']))
+                
+                analysis = self.sp.audio_analysis(self.track)
+                segments = analysis['segments']
+                
+                try:
+                    self.key = analysis['sections'][0]['key']
+                except:
+                    self.key = 7
 
-                pitch_vals.append(pitch_norm)
+                self.bpm = analysis['track']['tempo']
+                self.bpm = min(self.bpm, 120)
+                print(self.bpm)
+                self.refresh_rate = (60.0/self.bpm)/SAMPLE_FACTOR
 
-            self.time_vals = time_vals
 
-            #normalization for loudness vals from 0 to 1
-            loudness_vals = np.array(loudness_vals)
+                #self.refresh_rate = 0.05 
+               
+                time_vals = []
+                loudness_vals = []
+                pitch_vals = []
+                for segment in segments:
+                    if 'start' not in segment:
+                        time_vals.append(0.0)
+                    else:
+                        time_vals.append(segment['start'])
 
-            
-            #when normalizing don't look at beginning and end to give more dynamic range and avoid looking at outliers
-            adj_loud = loudness_vals[10:-10]
-            loudness_vals = (loudness_vals - np.min(adj_loud))/np.ptp(adj_loud)
-            
-            #make quiet sounds even quieter
-            loudness_vals[loudness_vals < 0] = 0
-            loudness_vals = np.power(loudness_vals, 2)
-            
+                    if 'loudness_start' not in segment:
+                        segment['loudness_start'] = -30.0
+                    if 'loudness_max' not in segment:
+                        segment['loudness_max'] = segment['loudness_start']
+                   
+                    #look to average loudness based off timbre 
+                    loudness_vals.append(segment['timbre'][0])
+                    
+                    pitch_norm = np.array(segment['pitches'])
+                    #put more of a bias on higher values for pitch
+                    pitch_norm = np.power(pitch_norm, 3)
+                    pitch_norm = pitch_norm/np.sum(pitch_norm)
 
-            loudness_vals = loudness_vals
-            self.loudness_vals = loudness_vals
+                    pitch_vals.append(pitch_norm)
 
-            #self.time_vals, self.loudness_vals = self.interp(self.time_vals, self.loudness_vals)
+                self.time_vals = time_vals
 
-            
-            
-            self.pitch_vals = []
-            self.pitch_vals = np.array(pitch_vals)
+                #normalization for loudness vals from 0 to 1
+                loudness_vals = np.array(loudness_vals)
+
+                
+                #when normalizing don't look at beginning and end to give more dynamic range and avoid looking at outliers
+                adj_loud = loudness_vals[10:-10]
+                loudness_vals = (loudness_vals - np.min(adj_loud))/np.ptp(adj_loud)
+                
+                #make quiet sounds even quieter
+                loudness_vals[loudness_vals < 0] = 0
+                loudness_vals = np.power(loudness_vals, 2)
+                
+
+                loudness_vals = loudness_vals
+                self.loudness_vals = loudness_vals
+
+                #self.time_vals, self.loudness_vals = self.interp(self.time_vals, self.loudness_vals)
+
+                
+                
+                self.pitch_vals = []
+                self.pitch_vals = np.array(pitch_vals)
+        except:
+            print("Could not get track analysis")
+            self.stop()
 
     def get_rgb_interp_fxns(self, pitch_vals):
         
