@@ -20,10 +20,10 @@ current_thread = [None]
 
 devices = pywemo.discover_devices()
 
+plug = None
 if len(devices) > 0:
-    plug = devices[0]
-else:
-    plug = None
+    #if there are multiple wemos, only pick the one w/ the right name
+    plug = [x for x in devices if x.name == 'Hexagon Lighting'][0]
 
 #plug = pywemo.discovery.device_from_description(CREDENTIALS['WEMO_URL'], None)
 
