@@ -19,7 +19,11 @@ current_thread = [None]
 
 
 devices = pywemo.discover_devices()
-plug = devices[0]
+
+if len(devices) > 0:
+    plug = devices[0]
+else:
+    plug = None
 
 #plug = pywemo.discovery.device_from_description(CREDENTIALS['WEMO_URL'], None)
 
@@ -168,17 +172,24 @@ def day_time():
 @end_current_thread
 def toggle_power():
 
-    plug.toggle()
+    if plug is not None:
+        plug.toggle()
 
 
-    response = jsonify({"data": {"is_on": plug.get_state()}})
+        response = jsonify({"data": {"is_on": plug.get_state()}})
+    else:
+        response = jsonify({"data": {"is_on": False}})
+
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
     
 @app.route("/plug_state")
 def plug_state():
 
-    response = jsonify({"data": {"is_on": plug.get_state()}})
+    if plug is not None:
+        response = jsonify({"data": {"is_on": plug.get_state()}})
+    else:
+        response = jsonify({"data": {"is_on": False}})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response 
 
