@@ -10,6 +10,14 @@ import urllib
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ["FLASK_SECRET"]
 
+#switch to http to avoid cross origin request issues
+@app.before_request
+def before_request():
+    if request.url.startswith('https://'):
+        url = request.url.replace('https://', 'http://', 1)
+        code = 301
+        return redirect(url, code=code)
+
 @app.route("/")
 def index():
         response = make_response(render_template('index.html'))

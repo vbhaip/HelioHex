@@ -10,7 +10,6 @@ addEventListener("DOMContentLoaded", function() {
 		$.ajax({
 			method: 'POST',
 			async: true,
-			crossDomain: true,
 			url: 'http://192.168.200.28:5000/authenticate_spotify',
 			data: token
 		});
@@ -42,7 +41,6 @@ addEventListener("DOMContentLoaded", function() {
 					async: true,
 					url: "http://192.168.200.28:5000/" + command,
 					cache: false,
-					crossDomain: true,
 					success: function(result){
 						enableInteractions();
 						if(button.id != "flash_around" && button.id != "set_color_palette" && button.id != "day_time"){
@@ -75,7 +73,6 @@ function getPlugState(){
                 async: true,
                 url: "http://192.168.200.28:5000/plug_state",
                 cache: false,
-				crossDomain: true,
                 success: function(result){
                     //console.log(result);
                     if(result['data']['is_on'] == 1){
@@ -99,7 +96,6 @@ slider.onchange = function(){
     $.ajax({
         async: false,
         url: "http://192.168.200.28:5000/set_brightness/" + slider.value/100.0,
-		crossDomain: true,
         cache: false,
         success: function(result){
             enableInteractions();
@@ -222,7 +218,6 @@ function makePickr(id, endpoint){
           $.ajax({
               async: true,
               url: "http://192.168.200.28:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
-			  crossDomain: true,
               cache: false,
               success: function(result){
                   enableInteractions();
@@ -263,7 +258,6 @@ function updatePath(){
     $.ajax({
         async: false,
         url: "http://192.168.200.28:5000/get_path",
-		crossDomain: true,
         cache: false,
         success: function(result){
             path = result['data']['path'];
@@ -347,7 +341,6 @@ function getHexColors(){
     $.ajax({
         async: true,
         url: "http://192.168.200.28:5000/get_hex_colors",
-		crossDomain: true,
         cache: false,
         success: function(result){
             for(let i = 0; i < hexagons.children.length; i++){
@@ -364,7 +357,6 @@ function getBrightnessSlider(){
     $.ajax({
         async: false,
         url: "http://192.168.200.28:5000/get_brightness",
-		crossDomain: true,
         cache: false,
         success: function(result){
             slider.value = ((parseInt(result['data']['brightness']*100)).toFixed(0));
