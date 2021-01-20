@@ -5,7 +5,7 @@ addEventListener("DOMContentLoaded", function() {
 	let token = document.cookie.slice(document.cookie.indexOf("=") + 1)
 	if(token !== 'null'){
 		$.ajax({
-			method: 'post',
+			method: 'POST',
 			async: true,
 			url: 'http://192.168.200.28:5000/authenticate_spotify',
 			data: token
