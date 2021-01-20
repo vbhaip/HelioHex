@@ -86,7 +86,13 @@ class SpotifyVisualizer:
         #i should hypothetically uncomment the line below but it still works regardless so imma leave it as is
         token = spotipy.util.prompt_for_user_token(CREDENTIALS["SPOTIFY_USERNAME"], scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"])
 
-        manager = spotipy.oauth2.SpotifyOAuth(username=CREDENTIALS["SPOTIFY_USERNAME"], scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"], cache_path="cached_spotify_token.txt")
+
+        f = open("cached-spotify-user.txt")
+        if "access_token" in json.load(f):
+            manager = spotipy.oauth2.SpotifyOAuth(scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID_USER_END"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET_USER_END"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI_USER_END"], cache_path="cached-spotify-user.txt")
+
+        else:
+            manager = spotipy.oauth2.SpotifyOAuth(username=CREDENTIALS["SPOTIFY_USERNAME"], scope=scope, client_id=CREDENTIALS["SPOTIFY_CLIENT_ID"], client_secret=CREDENTIALS["SPOTIFY_CLIENT_SECRET"], redirect_uri=CREDENTIALS["SPOTIFY_REDIRECT_URI"], cache_path="cached_spotify_token.txt")
 
         self.sp = spotipy.Spotify(oauth_manager=manager)
         self.sp_refresh = spotipy.Spotify(oauth_manager=manager)

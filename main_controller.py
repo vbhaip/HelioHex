@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 import light_controller as lc
 import spotify_visualizer_v2 as sv
 from threading import Thread
@@ -78,6 +78,21 @@ def play_song():
     response = jsonify({"data": "Visualizing song"})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@app.route("/authenticate_spotify", methods=["POST"])
+@end_current_thread
+def authenticate_spotify():
+    #format to way the cache wants it
+    raw = request.get_data().decode("utf-8").replace("'", '"')
+    print(raw)
+    f = open("cached-spotify-user.txt", "w")
+    f.write(raw)
+    f.close()
+
+    response = redirect(url_for("play_song"))
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 
 @app.route("/set_color/<string:rgb>")
 @end_current_thread
