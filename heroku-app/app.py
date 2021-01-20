@@ -40,7 +40,8 @@ def callback():
 
         tosend['expires_at'] = int(tosend['expires_in']) + time.time()
         #tosend = urllib.parse.urlencode(tosend)
-        tosend = json.dumps(tosend)
+        #tosend = json.dumps(tosend)
+        tosend = str(tosend)
 
         #requests.post(os.environ['RPI_BASE_URL'] + "authenticate_spotify", data=tosend)
         session['spotify_token'] = tosend
