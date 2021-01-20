@@ -1,12 +1,45 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, request
+import requests
 import urllib.request
 import os
+import sys
+import time
+import json
 
 app = Flask(__name__, static_url_path='/static')
 
 @app.route("/")
 def index():
 	return render_template('index.html') 
+
+@app.route("/callback")
+def callback():
+        #make post request to exchange auth code for token
+        code = request.args.get('code')
+
+        body = {}
+        body['grant_type'] = 'authorization_code'
+        body['code'] = code
+        body['redirect_uri'] = "http://heliohex.herokuapp.com/callback"
+        body['client_id'] = os.environ['SPOTIFY_CLIENT_ID']
+        body['client_secret'] = os.environ['SPOTIFY_CLIENT_SECRET']
+
+        response = requests.post('https://accounts.spotify.com/api/token', data=body)
+        print(response.text)
+        sys.stdout.flush()
+
+        tosend = response.json()
+
+        #if authentication goes wrong, nothing will happen
+        if "error" in tosend or "expires_in" not in tosend:
+            return redirect(url_for('index'))
+
+        tosend['expires_at'] = int(tosend['expires_in']) + time.time()
+        tosend = json.dumps(tosend)
+
+        requests.post(os.environ['RPI_BASE_URL'] + "authenticate_spotify", data=tosend)
+
+        return redirect(url_for('index'))
 
 @app.route("/ping_spotify")
 def ping_spotify():
@@ -28,7 +61,7 @@ def set_color():
 	urllib.request.urlopen(os.environ['RPI_BASE_URL'] + "set_color/200.200.0")
 	return (''), 204
 
-app.jinja_env.globals.update(ping_spotify=ping_spotify, flash_around=flash_around, rainbow_wheel=rainbow_wheel, set_color=set_color)
+app.jinja_env.globals.update(ping_spotify=ping_spotify, flash_around=flash_around, rainbow_wheel=rainbow_wheel, set_color=set_color, callback=callback)
 
 def main():
 	app.run(host="0.0.0.0", port=5000)
