@@ -7,8 +7,6 @@
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
 		<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.es5.min.js"></script>
-		<script>var spotify_token = {{ spotify_token }}</script>
-
 	</head>
 
 	<body>
@@ -24,7 +22,7 @@
 				<button type="button" class="button basic_button" id = "flash_around" value="flash_around">Flash Around</button>
 				<button type="button" class="button basic_button" id = "chase" value="chase">Chase</button>
 
-				<button type="button" class="button basic_button" value="play_song">Spotify Sync</button>
+				<button type="button" class="button basic_button" id-"spotify" value="play_song">Spotify Sync</button>
 				<button type="button" class="button basic_button" id="toggle_power" value="toggle_power">Turn Off</button>
 
 				<input type="range" min="0" max="100" value="50" class="slider" id="slider">

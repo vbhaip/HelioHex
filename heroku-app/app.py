@@ -1,17 +1,20 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, make_response
 import requests
 import urllib.request
 import os
 import sys
 import time
 import json
+import urllib
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ["FLASK_SECRET"]
 
 @app.route("/")
 def index():
-        return render_template('index.html', spotify_token=session.get('spotify_token', 'null')) 
+        response = make_response(render_template('index.html'))
+        response.set_cookie('token', session.get('spotify_token', "null"))
+        return response
 
 @app.route("/callback")
 def callback():
@@ -36,7 +39,7 @@ def callback():
             return redirect(url_for('index'))
 
         tosend['expires_at'] = int(tosend['expires_in']) + time.time()
-        tosend = json.dumps(tosend)
+        tosend = urllib.urlencode(tosend)
 
         #requests.post(os.environ['RPI_BASE_URL'] + "authenticate_spotify", data=tosend)
         session['spotify_token'] = tosend
