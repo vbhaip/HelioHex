@@ -1,5 +1,7 @@
 //https://stackoverflow.com/questions/21566649/flask-button-run-python-without-refreshing-page
 // Only run what comes next *after* the page has loaded
+
+let rpi_server = 'http://192.168.200.218:5000/';
 addEventListener("DOMContentLoaded", function() {
 
 	let token = document.cookie.slice(document.cookie.indexOf("=") + 1)
@@ -10,9 +12,11 @@ addEventListener("DOMContentLoaded", function() {
 		$.ajax({
 			method: 'POST',
 			async: true,
-			url: 'http://192.168.200.28:5000/authenticate_spotify',
+			url: rpi_server + 'authenticate_spotify',
 			data: token
 		});
+		//reset cookie so it won't launch automatically next visit to page
+		document.cookie = '';
 	}
    
     getPlugState();
@@ -39,7 +43,7 @@ addEventListener("DOMContentLoaded", function() {
 
 				$.ajax({
 					async: true,
-					url: "http://192.168.200.28:5000/" + command,
+					url: rpi_server + command,
 					cache: false,
 					success: function(result){
 						enableInteractions();
@@ -71,7 +75,7 @@ addEventListener("DOMContentLoaded", function() {
 function getPlugState(){
             $.ajax({
                 async: true,
-                url: "http://192.168.200.28:5000/plug_state",
+                url: rpi_server + "plug_state",
                 cache: false,
                 success: function(result){
                     //console.log(result);
@@ -95,7 +99,7 @@ slider.onchange = function(){
     disableInteractions();
     $.ajax({
         async: false,
-        url: "http://192.168.200.28:5000/set_brightness/" + slider.value/100.0,
+        url: rpi_server + "set_brightness/" + slider.value/100.0,
         cache: false,
         success: function(result){
             enableInteractions();
@@ -217,7 +221,7 @@ function makePickr(id, endpoint){
           disableInteractions();
           $.ajax({
               async: true,
-              url: "http://192.168.200.28:5000/" + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
+              url: rpi_server + endpoint + "/" + new_color[0] + "." + new_color[1] + "." + new_color[2],
               cache: false,
               success: function(result){
                   enableInteractions();
@@ -257,7 +261,7 @@ function updatePath(){
       
     $.ajax({
         async: false,
-        url: "http://192.168.200.28:5000/get_path",
+        url: rpi_server + "get_path",
         cache: false,
         success: function(result){
             path = result['data']['path'];
@@ -340,7 +344,7 @@ function getHexColors(){
     
     $.ajax({
         async: true,
-        url: "http://192.168.200.28:5000/get_hex_colors",
+        url: rpi_server + "get_hex_colors",
         cache: false,
         success: function(result){
             for(let i = 0; i < hexagons.children.length; i++){
@@ -356,7 +360,7 @@ function getBrightnessSlider(){
     
     $.ajax({
         async: false,
-        url: "http://192.168.200.28:5000/get_brightness",
+        url: rpi_server + "get_brightness",
         cache: false,
         success: function(result){
             slider.value = ((parseInt(result['data']['brightness']*100)).toFixed(0));
