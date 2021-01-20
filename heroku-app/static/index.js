@@ -3,6 +3,9 @@
 addEventListener("DOMContentLoaded", function() {
 
 	let token = document.cookie.slice(document.cookie.indexOf("=") + 1)
+	//cookies dont allow commas, so replace that to work normally, and remove start and end quotes
+	token = token.replace(/\\054/g, ',');
+	token = token.slice(1, -1)
 	if(token !== 'null'){
 		$.ajax({
 			method: 'POST',
