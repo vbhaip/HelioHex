@@ -32,11 +32,7 @@ addEventListener("DOMContentLoaded", function() {
             disableInteractions();
 
 			if(button.id === 'spotify'){
-				$.ajax({
-					async: false,
-					url: "https://accounts.spotify.com/authorize?client_id=f1dd20ef40d74fcaa4d9384a057c7846&response_type=code&redirect_uri=http%3A%2F%2Fheliohex.herokuapp.com%2Fcallback&scope=user-library-read%20user-modify-playback-state%20user-read-currently-playing%20user-read-playback-state%20user-modify-playback-state&state=34fFs29kd09",
-					cache: false
-				});
+				location.href =  "https://accounts.spotify.com/authorize?client_id=f1dd20ef40d74fcaa4d9384a057c7846&response_type=code&redirect_uri=http%3A%2F%2Fheliohex.herokuapp.com%2Fcallback&scope=user-library-read%20user-modify-playback-state%20user-read-currently-playing%20user-read-playback-state%20user-modify-playback-state&state=34fFs29kd09"
 			}
 
 			else{
