@@ -22,6 +22,9 @@ def before_request():
 def index():
         response = make_response(render_template('index.html'))
         response.set_cookie('token', session.get('spotify_token', "null"))
+
+        #remove session token
+        session['spotify_token'] = 'null'
         return response
 
 @app.route("/callback")

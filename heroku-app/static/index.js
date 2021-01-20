@@ -16,7 +16,7 @@ addEventListener("DOMContentLoaded", function() {
 			data: token
 		});
 		//reset cookie so it won't launch automatically next visit to page
-		document.cookie = '';
+		document.cookie += ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
 	}
    
     getPlugState();
