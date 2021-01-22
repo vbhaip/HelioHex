@@ -260,7 +260,7 @@ class Structure:
         pixels.brightness = MAX_BRIGHTNESS*b
     
     def get_brightness(self):
-        return pixels.brightness
+        return pixels.brightness/MAX_BRIGHTNESS
 
     def ripple_fade(self, start_hex_ind, color, delay, fade_time):
         start_hex = self.hexagons[start_hex_ind] 
