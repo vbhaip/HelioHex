@@ -29,6 +29,9 @@ REFRESH_RATE = 0.001
 
 RAINBOW = [PINK, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET]
 
+#to avoid power distribution issues, cap the brightness at a certain amount
+MAX_BRIGHTNESS = 0.5
+
 pixels = neopixel.NeoPixel(board.D18, HEX_COUNT*LED_HEX, auto_write=False, brightness=.5)
 
 
@@ -254,7 +257,7 @@ class Structure:
         hex2.connections[(hex1_side+3)%6] = hex1
     
     def set_brightness(self, b):
-        pixels.brightness = b
+        pixels.brightness = MAX_BRIGHTNESS*b
     
     def get_brightness(self):
         return pixels.brightness
