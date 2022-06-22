@@ -1,5 +1,5 @@
 scipy==1.4.1
-numpy==1.16.2
+numpy==1.22.0
 Flask==1.0.2
 Adafruit_Blinka==4.3.0
 spotipy==2.11.1
