@@ -82,7 +82,7 @@ def set_color():
 app.jinja_env.globals.update(ping_spotify=ping_spotify, flash_around=flash_around, rainbow_wheel=rainbow_wheel, set_color=set_color, callback=callback)
 
 def main():
-	app.run(host="0.0.0.0", port=5000)
+	app.run(host="0.0.0.0", port=5001)
 
 if __name__ == "__main__":
 	main()
