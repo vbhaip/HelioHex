@@ -4,3 +4,5 @@ cached_spotify_token.txt
 *.swp
 *.pem
 .DS_Store
+other
+wpa_supplicant.conf

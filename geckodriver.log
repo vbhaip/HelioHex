@@ -1,0 +1,30 @@
+1611607789409	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "-marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lb/fqddffrd2yqgq0fjfdt5fyn80000gq/T/rust_mozprofilecSuFCm"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1611607794151	Marionette	INFO	Listening on port 54838
+1611607795507	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://localhost:8000/sketchspherev2.js, line 38: unreachable code after return statement
+JavaScript warning: http://localhost:8000/sketchspherev2.js, line 38: unreachable code after return statement
+1611608449083	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "-marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lb/fqddffrd2yqgq0fjfdt5fyn80000gq/T/rust_mozprofilezG2QPB"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1611608453477	Marionette	INFO	Listening on port 56630
+1611608453528	Marionette	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+1611608476792	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "-marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lb/fqddffrd2yqgq0fjfdt5fyn80000gq/T/rust_mozprofileER0n1y"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1611608480284	Marionette	INFO	Listening on port 56846
+1611608480334	Marionette	WARN	TLS certificate errors will be ignored for this session
+1611611300391	Marionette	INFO	Stopped listening on port 56846
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
